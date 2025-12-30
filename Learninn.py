@@ -1,23 +1,24 @@
 import cv2 as cv
+import numpy as np
 
 # 1. Reading Images
-image = cv.imread('Images/Birds.jpg')
+# image = cv.imread('Images/Birds.jpg')
 # cv.imshow("CHECK",image)
 # cv.waitKey(0)
 
 # # 2. Read webcam (or video)
-# cap = cv.VideoCapture(0) # intialize
-# while True:
-#     check, frame = cap.read() # function redes vudeo/webcam and return bool(frame was succefull or not) and frame
-#     cv.imshow("Vid",frame)
-#     if cv.waitKey(2) & 0xFF == ord('d'): # id d is pressed and 
-#         break
-# cap.release()  # destroys memroy asssociated with opening wideo
-# cv.destroyAllWindows
+cap = cv.VideoCapture(0) # intialize
+while True:
+    check, frame = cap.read() # function redes vudeo/webcam and return bool(frame was succefull or not) and frame
+    cv.imshow("Vid",frame)
+    if cv.waitKey(2) & 0xFF == ord('d'): # id d is pressed and 
+        break
+cap.release()  # destroys memroy asssociated with opening wideo
+cv.destroyAllWindows
 
 # # 3 Basic operation:
 # # Resize:
-# resized_img = cv.resize(image,(200,200))
+# resized_img = cv.resize(image,(500,500))
 # cv.imshow("New",resized_img)
 # cv.waitKey(0)
 # # Crop:
@@ -48,14 +49,45 @@ image = cv.imread('Images/Birds.jpg')
 # cv.waitKey(0)
 
 # # 7. Contours and bounding boxes (For white space, makes lines around them)
-gray_version = cv.cvtColor(image,cv.COLOR_BGR2GRAY)
-thres = cv.adaptiveThreshold(gray_version,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,1001,8)# always make binary from cvt colour
-cv.imshow("new",thres)
-countours, hierachry = cv.findContours(thres,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
-for i in countours:
-    print(cv.contourArea(i))
-    if cv.contourArea(i) > 30:
-        x, y, width, height = cv.boundingRect(i)
-        cv.rectangle(image,(x,y),(x+width,y+height),(0,255,0),2)
-cv.imshow("Fresh",image)
-cv.waitKey(0)
+# gray_version = cv.cvtColor(resized_img,cv.COLOR_BGR2GRAY)
+# cv.imshow("Gray", gray_version)
+# blurred = cv.GaussianBlur(gray_version, (5, 5), 0)
+# cv.imshow("After Blur", blurred)
+# thres = cv.adaptiveThreshold(blurred, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
+# # isTrue, thres = cv.threshold(blurred, 127, 255, cv.THRESH_BINARY_INV)
+# cv.imshow("Threshold", thres)
+# countours, hierachry = cv.findContours(thres, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+# for i in countours:
+#     area = cv.contourArea(i)
+#     print(area)
+#     if area > 100:
+#         x, y, width, height = cv.boundingRect(i)
+#         cv.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
+# cv.imshow("BoundingBox", image)
+# cv.waitKey(0)
+
+
+
+### EXAMPLES
+
+# # 1. Reading red on webcam:
+# # 2. Read webcam (or video)
+# cap = cv.VideoCapture(0) # intialize
+# while True:
+#     check, frame = cap.read() # function redes vudeo/webcam and return bool(frame was succefull or not) and frame
+#     hue = cv.cvtColor(frame,cv.COLOR_BGR2HSV)
+#     colour_lower = np.array([0,130,80])
+#     colour_higher = np.array([20,255,255])
+#     object = cv.inRange(hue, colour_lower, colour_higher)
+#     countours, hierachry = cv.findContours(object, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+#     for i in countours:
+#         area = cv.contourArea(i)
+#         print(area)
+#         if area > 100:
+#             x, y, width, height = cv.boundingRect(i)
+#             cv.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
+#     cv.imshow("Vid",frame)
+#     if cv.waitKey(2) & 0xFF == ord('d'): # id d is pressed and 
+#         break
+# cap.release()  # destroys memroy asssociated with opening wideo
+# cv.destroyAllWindows
