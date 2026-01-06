@@ -71,10 +71,9 @@ cv.destroyAllWindows
 ### EXAMPLES
 
 # # 1. Reading red on webcam:
-# # 2. Read webcam (or video)
 # cap = cv.VideoCapture(0) # intialize
 # while True:
-#     check, frame = cap.read() # function redes vudeo/webcam and return bool(frame was succefull or not) and frame
+#     check, frame = cap.read() # function redes video/webcam and return bool(frame was succefull or not) and frame
 #     hue = cv.cvtColor(frame,cv.COLOR_BGR2HSV)
 #     colour_lower = np.array([0,130,80])
 #     colour_higher = np.array([20,255,255])
