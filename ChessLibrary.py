@@ -12,6 +12,10 @@ import chess
 # ADDED: sort for best move
 # WORK NEEDED: checkmate finder
 
+# Day 5:
+# Worked: Made a branch for depth, now code works for check in 1, check in 3, and chck in 3 from also having 1 more move in check
+# WORK NEEDED: If there is multiple checks which one is better, rn the function gives all possilbe checks, not all forced checks
+
 bot = chess.Board()
 file_path = "output.txt"
 best_Score_List = []
@@ -34,6 +38,7 @@ def reset():
 
 def minimax(Possible_move,depth,BlackTurn, firstcall = True): #Lets say black is chess bot
     if depth == 0:
+        # print("WRPS")
         white_pieces = sum([
             len(bot.pieces(chess.PAWN, chess.WHITE)),
             3*len(bot.pieces(chess.KNIGHT, chess.WHITE)),
@@ -61,56 +66,41 @@ def minimax(Possible_move,depth,BlackTurn, firstcall = True): #Lets say black is
         number_of_squares = len(moveList)
         valueAtPossition = black_pieces - white_pieces + number_of_squares
         return valueAtPossition
-    elif BlackTurn: # make sure not in checkmate currently
+    elif BlackTurn and not bot.is_checkmate(): # make sure not in checkmate currently
         bestScore = -10000
-        # print("now")
-        # print(bot.legal_moves)
-        # print(cnt[0])
         for move in Possible_move:
-            # print("MOVE")
-            # print(move)
             bot.push(move)
             if (len(list(bot.legal_moves))) == 0: # if check
                 bestScore = 1000000
+                bestScore+= (1000000*(depth-1))
                 bot.pop()
-                print("Move: " + str(move) + " is Checkmate")
-                print(bot)
-                break
-            # print(bot)
+                # print("Move: " + str(move) + " is Checkmate")
             else:
                 newScore = minimax(bot.legal_moves, depth-1,False,False)
                 if newScore == -1000000: #Saw checkmate in depth
                     newScore = -newScore
                 bestScore = max(newScore,bestScore)
-            bot.pop()
-            # print("done" + str(bestScore))
-            # print(bot)
+            # print("Done: " + str(move))
+                bot.pop()
             if firstcall: # INTIAL MOVE
-                bestScore = -10000
                 best_Score_List.append(bestScore)
                 best_Moves_List.append(move)
+                bestScore = -10000
         return bestScore
-    elif not BlackTurn:
-        bestScore = 10000
+    elif not BlackTurn and not bot.is_checkmate():
+        bestScore = 12300
         for move in Possible_move:
-            # print("MOVENotBlack")
-            # print(move)
             bot.push(move)
             if (len(list(bot.legal_moves))) == 0: # if checkmate
                 bestScore = -1000000
                 bot.pop()
                 print("Move2: " + str(move) + " is Checkmate")
-                break
-            # print(bot)
-            # bot.push(move)
             else:
                 newScore = minimax(bot.legal_moves, depth-1,True,False)
                 if newScore == 1000000: #Saw checkmate in depth
                     newScore = -newScore
                 bestScore = min(newScore,bestScore)
-            # print("doneNotBlack" + str(bestScore))
-            # print(bot)
-            bot.pop()
+                bot.pop()
             if firstcall: # INTIAL MOVE
                 best_Score_List.append(move)
                 best_Moves_List.append(bestScore)
@@ -119,22 +109,13 @@ def minimax(Possible_move,depth,BlackTurn, firstcall = True): #Lets say black is
         #BLACK LOST CUZ NO turns left
         return 0
 
-# print(bot.legal_moves)
-# bot.push_san("Nf3")
-# print(moveList)
-# minimax(bot.legal_moves,3,True)
-# print(best_Score_List)
-# print(best_Moves_List)
-# [Move.from_uci('a8b8'), Move.from_uci('a8a7'), Move.from_uci('a8a6'), Move.from_uci('a8a5'), Move.from_uci('a8a4'), Move.from_uci('a8a3'), Move.from_uci('a8a2'), Move.from_uci('d7e8'), Move.from_uci('d7d8'), Move.from_uci('d7e6'), Move.from_uci('d7d6'), Move.from_uci('d7c6'), Move.from_uci('f6g8'), Move.from_uci('f6e8'), Move.from_uci('f6h5'), Move.from_uci('f6d5'), Move.from_uci('f6g4'), Move.from_uci('f6e4'), Move.from_uci('h7h6'), Move.from_uci('g7g6'), Move.from_uci('e7e6'), Move.from_uci('c7c6'), Move.from_uci('b7b6'), Move.from_uci('h7h5'), Move.from_uci('g7g5'), Move.from_uci('e7e5'), Move.from_uci('c7c5'), Move.from_uci('b7b5')]
-# [-19, -19, -19, -19, -19, -19, -18, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19]
 bot.push_san("f3")      # White
 bot.push_san("e5")      # Black
 bot.push_san("g4")      # White
 # bot.push_san("Qh4#")    # Black - CHECKMATE!
 # <LegalMoveGenerator at 0x1b9c0f02dd0 (Ne7, Nh6, Nf6, Be7, Bd6, Bc5, Bb4, Ba3, Ke7, Qe7, Qf6, Qg5, Qh4#, Nc6, Na6, h6, g6, f6, d6, c6, b6, a6, e4, h5, g5, f5, d5, c5, b5, a5)>
 print(bot)
-minimax(bot.legal_moves,1,True,True)
-print(bot.legal_moves)
+minimax(bot.legal_moves,3,True,True)
 print(best_Score_List)
 print(best_Moves_List)
 
