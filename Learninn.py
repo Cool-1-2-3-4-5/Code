@@ -1,5 +1,19 @@
-import cv2 as cv
-import numpy as np
+import cv2 as cv2
+from ultralytics import YOLO
+
+model = YOLO(r"C:\Users\elilt\OneDrive\Desktop\Projects\Chess Robot\YOLO_and_Image_Database\best.pt")
+cap = cv2.VideoCapture(1)
+while True:
+    success, frame = cap.read()
+    if not success:
+        break
+    results = model(frame, conf=0.8)
+    newFrame = results[0].plot()
+    cv2.imshow("Chess Detection", newFrame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+cap.release()
+cv2.destroyAllWindows()
 
 # 1. Reading Images
 # image = cv.imread('Images/Birds.jpg')
@@ -7,14 +21,14 @@ import numpy as np
 # cv.waitKey(0)
 
 # # 2. Read webcam (or video)
-cap = cv.VideoCapture(0) # intialize
-while True:
-    check, frame = cap.read() # function redes vudeo/webcam and return bool(frame was succefull or not) and frame
-    cv.imshow("Vid",frame)
-    if cv.waitKey(2) & 0xFF == ord('d'): # id d is pressed and 
-        break
-cap.release()  # destroys memroy asssociated with opening wideo
-cv.destroyAllWindows
+# cap = cv.VideoCapture(0) # intialize
+# while True:
+#     check, frame = cap.read() # function redes vudeo/webcam and return bool(frame was succefull or not) and frame
+#     cv.imshow("Vid",frame)
+#     if cv.waitKey(2000) & 0xFF == ord('d'): # id d is pressed and 
+#         break
+# cap.release()  # destroys memroy asssociated with opening wideo
+# cv.destroyAllWindows
 
 # # 3 Basic operation:
 # # Resize:

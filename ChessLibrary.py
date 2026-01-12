@@ -40,7 +40,7 @@ def reset():
     best_Moves_List.clear()
 
 
-def minimax(Possible_move,depth,BlackTurn, firstcall = True): #Lets say black is chess bot
+def minimax(Possible_move,depth,BlackTurn, alpha = 0, beta = 0, firstcall = True): #Lets say black is chess bot
     if depth == 0 or bot.is_checkmate():
         white_num = 1
         black_num = 1
@@ -91,13 +91,15 @@ def minimax(Possible_move,depth,BlackTurn, firstcall = True): #Lets say black is
         bestScore = -10000
         for move in Possible_move:
             bot.push(move)
-            newScore = minimax(bot.legal_moves, depth-1,False,False)
+            newScore = minimax(bot.legal_moves, depth-1,False, bestScore, newScore, False)
             bestScore = max(newScore,bestScore)
             bot.pop()
             if firstcall: # INTIAL MOVE
                 best_Score_List.append(bestScore)
                 best_Moves_List.append(move)
                 bestScore = -10000
+            # if alpha > beta:
+
         return bestScore
     elif not BlackTurn:
         bestScore = 10000
