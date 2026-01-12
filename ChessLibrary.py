@@ -16,6 +16,10 @@ import chess
 # Worked: Made a branch for depth, now code works for check in 1, check in 3, and chck in 3 from also having 1 more move in check
 # WORK NEEDED: If there is multiple checks which one is better, rn the function gives all possilbe checks, not all forced checks
 
+# Day 6:
+# DOne: Minimax
+# WORK NEEDED: Pruning
+
 bot = chess.Board()
 file_path = "output.txt"
 best_Score_List = []
@@ -38,18 +42,18 @@ def reset():
 
 def minimax(Possible_move,depth,BlackTurn, firstcall = True): #Lets say black is chess bot
     if depth == 0 or bot.is_checkmate():
-        white_num = 0
-        black_num = 0
+        white_num = 1
+        black_num = 1
         number_of_squares = 0
         if bot.is_checkmate():
             if BlackTurn:
                 print("No Won")
-                white_num = 1
-                number_of_squares -=200
+                black_num = 0
+                # number_of_squares -=200
             else:
                 print("WIN " + str(depth))
-                black_num = 1
-                number_of_squares +=200
+                white_num = 0
+                # number_of_squares +=200
         white_pieces = sum([
             len(bot.pieces(chess.PAWN, chess.WHITE)),
             3*len(bot.pieces(chess.KNIGHT, chess.WHITE)),
@@ -66,60 +70,60 @@ def minimax(Possible_move,depth,BlackTurn, firstcall = True): #Lets say black is
             9*len(bot.pieces(chess.QUEEN, chess.BLACK)),
             90*black_num*len(bot.pieces(chess.KING, chess.BLACK))
         ])
-        moveList = set() # number of squares occupied
+        moveList = set() # number of squares occupied by opposite team
         for move in bot.legal_moves:
+            # print(bot.legal_moves)
             newstr = bot.san(move)
             iteration = -1
-            if not newstr[-1].isdigit():
+            # <LegalMoveGenerator at 0x1d1060a03d0 (Nh3, Nf3, Ne2, Bxa6, Bb5, Bc4, Bd3, Be2, Ke2, Qh5, Qg4, Qf3, Qe2, Nc3, Na3, e5, h3, g3, f3, d3, c3, b3, a3, h4, g4, f4, d4, c4, b4, a4)>
+            if not newstr[-1].isdigit(): # if move is check or checkmate
                 iteration = iteration-1
             square = str(newstr[iteration-1]) + str(newstr[iteration])
             moveList.add(square)
         number_of_squares += len(moveList)
-        valueAtPossition = black_pieces*(depth+1) - white_pieces*(depth+1) + number_of_squares
-        if bot.is_checkmate():
-            print("Black: " + str(black_pieces) + "White: " + str(white_pieces) + " numSquares: " + str(number_of_squares))
-            print("BlackNum: " + str(black_num) + " WhiteNum: " + str(white_num))
-            print("ValueAtPos" + str(valueAtPossition))
+        valueAtPossition = black_pieces*(depth+1) - white_pieces*(depth+1) - number_of_squares
+        # if bot.is_checkmate():
+        # print("Black: " + str(black_pieces) + "White: " + str(white_pieces) + " numSquares: " + str(number_of_squares))
+        # print("BlackNum: " + str(black_num) + " WhiteNum: " + str(white_num))
+        # print("ValueAtPos" + str(valueAtPossition))
         return valueAtPossition
     elif BlackTurn: # make sure not in checkmate currently
         bestScore = -10000
-        force_checkmate_cnt = 0 # Uses to iterate through number of checkmates
         for move in Possible_move:
             bot.push(move)
             newScore = minimax(bot.legal_moves, depth-1,False,False)
-            if newScore > 18:
-                print("NEWSCOE: " + str(newScore) + " "+ str(move))
             bestScore = max(newScore,bestScore)
             bot.pop()
             if firstcall: # INTIAL MOVE
                 best_Score_List.append(bestScore)
                 best_Moves_List.append(move)
                 bestScore = -10000
-        print("Highest = " + str(bestScore) + " " + str(depth))
         return bestScore
     elif not BlackTurn:
         bestScore = 10000
         for move in Possible_move:
             bot.push(move)
             newScore = minimax(bot.legal_moves, depth-1,True,False)
-            if newScore == 1000000: #Saw checkmate in depth
-                newScore = -newScore
             bestScore = min(newScore,bestScore)
             bot.pop()
             if firstcall: # INTIAL MOVE
                 best_Score_List.append(move)
                 best_Moves_List.append(bestScore)
                 bestScore = 10000
-        print("Lowest = " + str(bestScore))
         return bestScore
     else:
         #BLACK LOST CUZ NO turns left
         return 0
 
 bot = chess.Board()
-bot.push_san("f3")
-# bot.push_san("e6")
-# bot.push_san("g4")
+bot.push_san("e4")      # White
+bot.push_san("e5")      # Black
+bot.push_san("Nf3")     # White
+bot.push_san("Nc6")     # Black
+bot.push_san("Bc4")     # White
+bot.push_san("Bc5")     # Black (Classical Defense)
+bot.push_san("O-O")     # White
+
 print(bot)
 print(bot.legal_moves)
 minimax(bot.legal_moves,3,True,True)
