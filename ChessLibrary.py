@@ -20,6 +20,11 @@ import chess
 # DOne: Minimax
 # WORK NEEDED: Pruning
 
+# Day 7:
+# Done: Pruning and Minimax
+# Works up to depth of 5 or 35000+ nodes
+# Work on Open CV
+
 bot = chess.Board()
 file_path = "output.txt"
 best_Score_List = []
@@ -27,33 +32,43 @@ best_Moves_List = []
 cnt = [0]
 increment = 0
 
-def BestMove(list1,list2):
-    combined = list(zip(list1,list2))
-    combined.sort(key =lambda x: x[0])
-    list1,list2 = zip(*combined)
-    list1,list2 = list(list1),list(list2)
-    return list2[-1]
+# def BestMove(list1,list2):
+#     combined = list(zip(list1,list2))
+#     combined.sort(key =lambda x: x[0])
+#     list1,list2 = zip(*combined)
+#     list1,list2 = list(list1),list(list2)
+#     return list2[-1]
 
-def reset():
-    cnt[0] = 0
-    best_Score_List.clear()
-    best_Moves_List.clear()
+# def reset():
+#     cnt[0] = 0
+#     best_Score_List.clear()
+#     best_Moves_List.clear()
+
+def InterpetMove(move,moveInSan):
+    if move == "O-O-O":
+        # Move servos to perform queenside castle
+        pass
+    elif move == "O-O":
+        pass
+        # Move servos to perform kingside cas tle
+    elif "x" in moveInSan:
+        pass
+        # Move servos to remove piece at Point A first and then move piece to Point B
+    else:
+        pass
+        # Move servos to pick up piece from point A and place in point B
 
 
-def minimax(Possible_move,depth,BlackTurn, alpha = 0, beta = 0, firstcall = True): #Lets say black is chess bot
+def minimax(Possible_move,depth,BlackTurn, alpha,beta,firstcall = True): #Lets say black is chess bot
     if depth == 0 or bot.is_checkmate():
         white_num = 1
         black_num = 1
         number_of_squares = 0
         if bot.is_checkmate():
             if BlackTurn:
-                print("No Won")
                 black_num = 0
-                # number_of_squares -=200
             else:
-                print("WIN " + str(depth))
                 white_num = 0
-                # number_of_squares +=200
         white_pieces = sum([
             len(bot.pieces(chess.PAWN, chess.WHITE)),
             3*len(bot.pieces(chess.KNIGHT, chess.WHITE)),
@@ -72,84 +87,65 @@ def minimax(Possible_move,depth,BlackTurn, alpha = 0, beta = 0, firstcall = True
         ])
         moveList = set() # number of squares occupied by opposite team
         for move in bot.legal_moves:
-            # print(bot.legal_moves)
             newstr = bot.san(move)
             iteration = -1
-            # <LegalMoveGenerator at 0x1d1060a03d0 (Nh3, Nf3, Ne2, Bxa6, Bb5, Bc4, Bd3, Be2, Ke2, Qh5, Qg4, Qf3, Qe2, Nc3, Na3, e5, h3, g3, f3, d3, c3, b3, a3, h4, g4, f4, d4, c4, b4, a4)>
             if not newstr[-1].isdigit(): # if move is check or checkmate
                 iteration = iteration-1
             square = str(newstr[iteration-1]) + str(newstr[iteration])
             moveList.add(square)
         number_of_squares += len(moveList)
-        valueAtPossition = black_pieces*(depth+1) - white_pieces*(depth+1) - number_of_squares
-        # if bot.is_checkmate():
-        # print("Black: " + str(black_pieces) + "White: " + str(white_pieces) + " numSquares: " + str(number_of_squares))
-        # print("BlackNum: " + str(black_num) + " WhiteNum: " + str(white_num))
-        # print("ValueAtPos" + str(valueAtPossition))
+        valueAtPossition = black_pieces*(depth+1) - white_pieces*(depth+1) - 0.8*number_of_squares
         return valueAtPossition
     elif BlackTurn: # make sure not in checkmate currently
         bestScore = -10000
         for move in Possible_move:
             bot.push(move)
-            newScore = minimax(bot.legal_moves, depth-1,False, bestScore, newScore, False)
-            bestScore = max(newScore,bestScore)
+            newScore = minimax(bot.legal_moves, depth-1,False,alpha,beta,False)
             bot.pop()
+            bestScore = max(newScore,bestScore)
+            if bestScore == newScore and firstcall:
+                theBestMove = str(move)
+                theBestMoveinsan = bot.san(move)
+            alpha = max(alpha,newScore)
             if firstcall: # INTIAL MOVE
                 best_Score_List.append(bestScore)
                 best_Moves_List.append(move)
-                bestScore = -10000
-            # if alpha > beta:
-
+            if beta <= alpha:
+                break
+        if firstcall:
+            return theBestMove,theBestMoveinsan
         return bestScore
     elif not BlackTurn:
         bestScore = 10000
         for move in Possible_move:
             bot.push(move)
-            newScore = minimax(bot.legal_moves, depth-1,True,False)
-            bestScore = min(newScore,bestScore)
+            newScore = minimax(bot.legal_moves, depth-1,True,alpha,beta,False)
             bot.pop()
-            if firstcall: # INTIAL MOVE
-                best_Score_List.append(move)
-                best_Moves_List.append(bestScore)
-                bestScore = 10000
+            bestScore = min(newScore,bestScore)
+            beta = min(beta,newScore)
+            if beta <= alpha:
+                break
         return bestScore
     else:
         #BLACK LOST CUZ NO turns left
         return 0
+    
 
-bot = chess.Board()
-bot.push_san("e4")      # White
-bot.push_san("e5")      # Black
-bot.push_san("Nf3")     # White
-bot.push_san("Nc6")     # Black
-bot.push_san("Bc4")     # White
-bot.push_san("Bc5")     # Black (Classical Defense)
-bot.push_san("O-O")     # White
-
-print(bot)
-print(bot.legal_moves)
-minimax(bot.legal_moves,3,True,True)
-print(best_Score_List)
-print(best_Moves_List)
-
-# while not bot.is_checkmate():
-#     print(bot)
-#     myMove = input("ENTER Move: ")
-#     bot.push_san(str(myMove))
-#     print(bot)
-#     print(bot.legal_moves)
-#     minimax(bot.legal_moves,1,True,True)
-#     print(best_Score_List)
-#     print(best_Moves_List)
-#     print("BestMove")
-#     NextMove = BestMove(best_Score_List,best_Moves_List)
-#     print(NextMove)
-#     bot.push_uci(str(NextMove))
-#     reset()
-
-print("GAME Over")
-# print(f"White in check: {bot.is_check()}")
-# print(f"Checkmate: {bot.is_checkmate()}")
+while not bot.is_checkmate():
+    print(bot)
+    print("Play your Move\nPRESS: SPACE to confirm")
+    x = input()
+    # bot.push_san(str(x))
+    if bot.is_checkmate():
+        break
+    # Open CV views object
+    # CV translates this by sending it to 2x2 matrix which then updates the board
+    # MAYBE: Add GUI
+    # Perform Minimax
+    #interepet move
+    bestMove,bestmoveinsan = minimax(bot.legal_moves,3,True,-100000,100000,True)
+    InterpetMove(bestMove,bestmoveinsan)
+print("Game Over!")
 
 # File write happens after every move:
 # with open(file_path, 'w') as file:
