@@ -1,19 +1,4 @@
-import cv2 as cv2
-from ultralytics import YOLO
 
-model = YOLO(r"C:\Users\elilt\OneDrive\Desktop\Projects\Chess Robot\YOLO_and_Image_Database\best.pt")
-cap = cv2.VideoCapture(1)
-while True:
-    success, frame = cap.read()
-    if not success:
-        break
-    results = model(frame, conf=0.8)
-    newFrame = results[0].plot()
-    cv2.imshow("Chess Detection", newFrame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-cap.release()
-cv2.destroyAllWindows()
 
 # 1. Reading Images
 # image = cv.imread('Images/Birds.jpg')
