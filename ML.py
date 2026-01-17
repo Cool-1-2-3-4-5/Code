@@ -2,6 +2,12 @@ import cv2 as cv2
 import numpy as np
 # from ultralytics import YOLO
 
+
+# For Webcam
+# import os
+# os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+# import cv2
+
 # Chess Model
 # model = YOLO(r"C:\Users\elilt\OneDrive\Desktop\Projects\Chess Robot\YOLO_and_Image_Database\best.pt")
 # cap = cv2.VideoCapture(1)
