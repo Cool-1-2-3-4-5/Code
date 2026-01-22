@@ -47,14 +47,18 @@ increment = 0
 def InterpetMove(move,moveInSan):
     if move == "O-O-O":
         # Move servos to perform queenside castle
+        print("Queen")
         pass
     elif move == "O-O":
+        print("King")
         pass
         # Move servos to perform kingside cas tle
     elif "x" in moveInSan:
+        print("Piece Won")
         pass
         # Move servos to remove piece at Point A first and then move piece to Point B
     else:
+        print("Reg")
         pass
         # Move servos to pick up piece from point A and place in point B
 
@@ -135,7 +139,7 @@ while not bot.is_checkmate():
     print(bot)
     print("Play your Move\nPRESS: SPACE to confirm")
     x = input()
-    # bot.push_san(str(x))
+    bot.push_san(str(x))
     if bot.is_checkmate():
         break
     # Open CV views object
