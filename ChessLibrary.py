@@ -46,24 +46,20 @@ increment = 0
 
 def InterpetMove(move,moveInSan):
     if move == "O-O-O":
+        return "Queenside",move
         # Move servos to perform queenside castle
-        print("Queen")
-        pass
     elif move == "O-O":
-        print("King")
-        pass
+        return "Kingside",move
         # Move servos to perform kingside cas tle
     elif "x" in moveInSan:
-        print("Piece Won")
-        pass
+        return "Piece Won",move
         # Move servos to remove piece at Point A first and then move piece to Point B
     else:
-        print("Reg")
-        pass
+        return "Regular",move
         # Move servos to pick up piece from point A and place in point B
 
 
-def minimax(Possible_move,depth,BlackTurn, alpha,beta,firstcall = True): #Lets say black is chess bot
+def minimax(bot, Possible_move,depth,BlackTurn, alpha,beta,firstcall = True): #Lets say black is chess bot
     if depth == 0 or bot.is_checkmate():
         white_num = 1
         black_num = 1

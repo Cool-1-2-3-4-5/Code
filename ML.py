@@ -14,16 +14,17 @@ model = YOLO(r"C:\Users\elilt\OneDrive\Desktop\Projects\Chess Robot\YOLO_and_Ima
 print("H2")
 cap = cv2.VideoCapture(0)
 
-while True:
-    success, frame = cap.read()
-    if not success:
-        break
-    results = model(frame, conf=0.5)
-    newFrame = results[0].plot()
-    enlarged_frame = cv2.resize(newFrame, None, fx=1.6, fy=1.6, interpolation=cv2.INTER_CUBIC)
-    cv2.imshow("Chess Detection", enlarged_frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+def board_analyser(cv2,cap):
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        results = model(frame, conf=0.5)
+        newFrame = results[0].plot()
+        enlarged_frame = cv2.resize(newFrame, None, fx=1.6, fy=1.6, interpolation=cv2.INTER_CUBIC)
+        cv2.imshow("Chess Detection", enlarged_frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 cap.release()
 cv2.destroyAllWindows()
 
