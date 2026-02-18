@@ -1,33 +1,38 @@
-
-import numpy as np
-from ultralytics import YOLO
-
-
-# For Webcam
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2 as cv2
+import time
 
 # Chess Model
-print("H!")
-model = YOLO(r"C:\Users\elilt\OneDrive\Desktop\Projects\Chess Robot\YOLO_and_Image_Database\best.pt")
 print("H2")
 cap = cv2.VideoCapture(0)
+print("H2")
 
-def board_analyser(cv2,cap):
+def board_analyser(cap):
+    capture = 0
+    time_initial = 0
     while True:
         success, frame = cap.read()
         if not success:
             break
-        results = model(frame, conf=0.5)
-        newFrame = results[0].plot()
-        enlarged_frame = cv2.resize(newFrame, None, fx=1.6, fy=1.6, interpolation=cv2.INTER_CUBIC)
-        cv2.imshow("Chess Detection", enlarged_frame)
+        chess_frame = frame.copy()
+        imgray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(imgray, 60, 255, cv2.THRESH_BINARY_INV)
+        countours, hierachry = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        for i in countours:
+            noise = cv2.contourArea(i)
+            if noise > 700:
+                x, y, width, height = cv2.boundingRect(i)
+                cv2.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
+        cv2.imshow("Main Frame", frame)
+        cv2.imshow("thres", thresh)
+        cv2.imshow("gray", imgray)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-cap.release()
-cv2.destroyAllWindows()
-
+    cap.release()
+    cv2.destroyAllWindows()
+board_analyser(cap)
+    
 
 # #Parametres
 # def empty():
