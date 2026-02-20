@@ -1,3 +1,111 @@
+import os
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+import cv2 as cv2
+import numpy as np
+import time
+
+# Calibration Data
+cameraMatrix = np.array([
+    [727.84220328, 0., 354.16226615],
+    [0., 730.03025553, 221.97923977],
+    [0., 0., 1.]
+])
+
+distCoeffs = np.array([
+    [0.11655149, -0.0385357, 0.00033531, 0.00156088, 0.31343139]
+])
+
+
+def undistort_frame(frame):
+    h,  w = frame.shape[:2]
+    newCameraMatrix, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, (w,h), 1, (w,h))
+    
+    # Undistort
+    dst = cv2.undistort(frame, cameraMatrix, distCoeffs, None, newCameraMatrix)
+    
+    # crop the image
+    x, y, w, h = roi
+    dst = dst[y:y+h, x:x+w]
+    return dst
+
+click_point = None
+
+def mouse_callback(event, x, y, flags, param):
+    global click_point
+    if event == cv2.EVENT_LBUTTONDOWN:
+        click_point = (x, y)
+        print(f"Clicked at: {click_point}")
+
+# Chess Model
+print("H2")
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+print("H2")
+file_name = 'test.jpg'
+
+def board_analyser(cap):
+    cv2.namedWindow("Frame")
+    # Tell OpenCV to run 'mouse_callback' when events happen in the "Frame" window
+    cv2.setMouseCallback("Frame", mouse_callback)
+    main_set = set()
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        
+        frame = undistort_frame(frame) # Assuming this function exists from your code
+
+        # If we have clicked somewhere, draw a circle there
+        if click_point is not None:
+            main_set.add(click_point)
+        
+        for i in main_set:
+            cv2.circle(frame, i, 5, (0, 0, 255), -1)
+
+        if len(main_set) == 4:
+            pts = list(main_set)
+            pts.sort(key=lambda p: p[1])
+            top_pts = sorted(pts[:2], key=lambda p: p[0])
+            bot_pts = sorted(pts[2:], key=lambda p: p[0])
+            TL, TR = top_pts[0], top_pts[1]
+            BL, BR = bot_pts[0], bot_pts[1]
+            
+            delta_x = TR[0]-TL[0]
+            delta_y = BL[0]-TL[0]
+            delta_x = delta_x/8
+            delta_y = delta_y/8
+            x_pos = TL[0]
+            y_pos = TL[1]
+            for i in range(8):
+                y_pos = y_pos+(i*y_pos)
+                for i in range(8):
+                    x_pos = x_pos+(i*x_pos)
+
+        cv2.imshow("Frame", frame)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+            
+    cap.release()
+    cv2.destroyAllWindows()
+
+board_analyser(cap)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 1. Reading Images

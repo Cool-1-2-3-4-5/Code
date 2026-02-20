@@ -1,11 +1,40 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2 as cv2
+import numpy as np
 import time
+
+
+# Calibration Data
+cameraMatrix = np.array([
+    [727.84220328, 0., 354.16226615],
+    [0., 730.03025553, 221.97923977],
+    [0., 0., 1.]
+])
+
+distCoeffs = np.array([
+    [0.11655149, -0.0385357, 0.00033531, 0.00156088, 0.31343139]
+])
+
+
+def undistort_frame(frame):
+    h,  w = frame.shape[:2]
+    newCameraMatrix, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, (w,h), 1, (w,h))
+    
+    # Undistort
+    dst = cv2.undistort(frame, cameraMatrix, distCoeffs, None, newCameraMatrix)
+    
+    # crop the image
+    x, y, w, h = roi
+    dst = dst[y:y+h, x:x+w]
+    return dst
+
 
 # Chess Model
 print("H2")
 cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 print("H2")
 
 def board_analyser(cap):
@@ -15,17 +44,28 @@ def board_analyser(cap):
         success, frame = cap.read()
         if not success:
             break
-        chess_frame = frame.copy()
+        frame = undistort_frame(frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            chess_frame = frame.copy()
+
         imgray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        ret, thresh = cv2.threshold(imgray, 60, 255, cv2.THRESH_BINARY_INV)
-        countours, hierachry = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        for i in countours:
+        ret, black_pieces = cv2.threshold(imgray, 40, 255, cv2.THRESH_BINARY_INV)
+        # ret2, white_pieces = cv2.threshold(imgray, 50, 255, cv2.THRESH_BINARY)
+        black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # white_countours, hierachry = cv2.findContours(white_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        for i in black_countours:
             noise = cv2.contourArea(i)
             if noise > 700:
                 x, y, width, height = cv2.boundingRect(i)
                 cv2.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
+        # for j in white_countours:
+        #     noise = cv2.contourArea(i)
+        #     if noise > 700:
+        #         x, y, width, height = cv2.boundingRect(i)
+        #         cv2.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
         cv2.imshow("Main Frame", frame)
-        cv2.imshow("thres", thresh)
+        cv2.imshow("black_pieces", black_pieces)
+        # cv2.imshow("white_pieces", white_pieces)
         cv2.imshow("gray", imgray)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
