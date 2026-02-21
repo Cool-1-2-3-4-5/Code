@@ -3,6 +3,7 @@ os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2 as cv2
 import numpy as np
 import time
+import math
 
 # Calibration Data
 cameraMatrix = np.array([
@@ -29,12 +30,41 @@ def undistort_frame(frame):
     return dst
 
 click_point = None
+board_dict = {}
+board_length = []
 
 def mouse_callback(event, x, y, flags, param):
     global click_point
     if event == cv2.EVENT_LBUTTONDOWN:
         click_point = (x, y)
         print(f"Clicked at: {click_point}")
+
+def piece_in_square(middle_of_piece):
+    letters_array = ['a','b','c','d','e','f','g','h']
+    x_pos = middle_of_piece[0]
+    y_pos = middle_of_piece[1]
+    top_corner_of_board = board_dict['a1'][0]
+    relative_x_pos = x_pos - top_corner_of_board[0]
+    relative_y_pos = y_pos - top_corner_of_board[1]
+    raw_x = relative_x_pos/board_length[0]
+    raw_y = relative_y_pos/board_length[1]
+    true_pos_x = math.floor(raw_x)
+    true_pos_y = math.floor(raw_y)
+    piece = letters_array[true_pos_x] + str(true_pos_y+1)
+    return piece
+
+
+# LOOKL OVER THIS FUNCTION
+def eval_board(current_setup_black,current_setup_white,previous_setup_black,previous_setup_white,black_prev,white_prev,black_cur,white_cur):
+    string = ''
+    for update in previous_setup_white:
+        if update in current_setup_white:
+            previous_setup_white.remove(update)
+            current_setup_white.remove(update)
+        else: #updated move
+            string += update
+    string += current_setup_white[0]
+    return string
 
 # Chess Model
 print("H2")
@@ -72,15 +102,36 @@ def board_analyser(cap):
             BL, BR = bot_pts[0], bot_pts[1]
             
             delta_x = TR[0]-TL[0]
-            delta_y = BL[0]-TL[0]
+            delta_y = BL[1]-TL[1]
             delta_x = delta_x/8
             delta_y = delta_y/8
             x_pos = TL[0]
             y_pos = TL[1]
+            global board_length
+            board_length = [delta_x,delta_y]
+            letters_array = ['a','b','c','d','e','f','g','h']
+            # global board_dict
             for i in range(8):
-                y_pos = y_pos+(i*y_pos)
-                for i in range(8):
-                    x_pos = x_pos+(i*x_pos)
+                for j in range(8):
+                    string = letters_array[j] + str(i+1)
+                    x_first = int(x_pos+(j*delta_x))
+                    x_second = int(x_pos+((j+1)*delta_x))
+                    y_first = int(y_pos+(i*delta_y))
+                    y_second = int(y_pos+((i+1)*delta_y))
+                    borders_list = []
+                    TLC = (x_first,y_first)
+                    TRC = (x_second,y_first)
+                    BLC = (x_first,y_second)
+                    BRC = (x_second,y_second)
+                    borders_list.append(TLC)
+                    borders_list.append(TRC)
+                    borders_list.append(BLC)
+                    borders_list.append(BRC)
+                    cv2.circle(frame, (x_first,y_first), 5, (0, 0, 255), -1)
+                    cv2.circle(frame, (x_second,y_first), 3, (255, 0, 0), -1)
+                    cv2.circle(frame, (x_first,y_second), 5, (0, 255, 0), -1)
+                    cv2.circle(frame, (x_second,y_second), 3, (255,0, 255), -1)
+                    board_dict[string] = borders_list
 
         cv2.imshow("Frame", frame)
         
@@ -91,6 +142,8 @@ def board_analyser(cap):
     cv2.destroyAllWindows()
 
 board_analyser(cap)
+
+print(board_dict)
 
 
 
