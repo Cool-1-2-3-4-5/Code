@@ -4,7 +4,7 @@ import cv2 as cv2
 import numpy as np
 import time
 import math
-
+cap = cv2.VideoCapture(0)
 # Calibration Data
 cameraMatrix = np.array([
     [727.84220328, 0., 354.16226615],
@@ -30,8 +30,6 @@ def undistort_frame(frame):
     return dst
 
 click_point = None
-board_dict = {}
-board_length = []
 
 def mouse_callback(event, x, y, flags, param):
     global click_point
@@ -39,11 +37,11 @@ def mouse_callback(event, x, y, flags, param):
         click_point = (x, y)
         print(f"Clicked at: {click_point}")
 
-def piece_in_square(middle_of_piece):
+def piece_in_square(middle_of_piece,board_length):
     letters_array = ['a','b','c','d','e','f','g','h']
     x_pos = middle_of_piece[0]
     y_pos = middle_of_piece[1]
-    top_corner_of_board = board_dict['a1'][0]
+    top_corner_of_board = board_length[2]
     relative_x_pos = x_pos - top_corner_of_board[0]
     relative_y_pos = y_pos - top_corner_of_board[1]
     raw_x = relative_x_pos/board_length[0]
@@ -53,32 +51,23 @@ def piece_in_square(middle_of_piece):
     piece = letters_array[true_pos_x] + str(true_pos_y+1)
     return piece
 
-
-# LOOKL OVER THIS FUNCTION
-def eval_board(current_setup_black,current_setup_white,previous_setup_black,previous_setup_white,black_prev,white_prev,black_cur,white_cur):
+def eval_board(current_setup_black,previous_setup_black,black_prev_num,black_cur_num):
     string = ''
-    for update in previous_setup_white:
-        if update in current_setup_white:
-            previous_setup_white.remove(update)
-            current_setup_white.remove(update)
+    for update in previous_setup_black:
+        if update in current_setup_black:
+            previous_setup_black.remove(update)
+            current_setup_black.remove(update)
         else: #updated move
             string += update
-    string += current_setup_white[0]
+    string += current_setup_black[0]
     return string
 
-# Chess Model
-print("H2")
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-print("H2")
-file_name = 'test.jpg'
-
-def board_analyser(cap):
+def board_setup(cap):
     cv2.namedWindow("Frame")
     # Tell OpenCV to run 'mouse_callback' when events happen in the "Frame" window
     cv2.setMouseCallback("Frame", mouse_callback)
     main_set = set()
+    board_length = []
     while True:
         success, frame = cap.read()
         if not success:
@@ -107,10 +96,8 @@ def board_analyser(cap):
             delta_y = delta_y/8
             x_pos = TL[0]
             y_pos = TL[1]
-            global board_length
-            board_length = [delta_x,delta_y]
+            board_length = [delta_x,delta_y,TL]
             letters_array = ['a','b','c','d','e','f','g','h']
-            # global board_dict
             for i in range(8):
                 for j in range(8):
                     string = letters_array[j] + str(i+1)
@@ -127,29 +114,51 @@ def board_analyser(cap):
                     borders_list.append(TRC)
                     borders_list.append(BLC)
                     borders_list.append(BRC)
-                    cv2.circle(frame, (x_first,y_first), 5, (0, 0, 255), -1)
-                    cv2.circle(frame, (x_second,y_first), 3, (255, 0, 0), -1)
-                    cv2.circle(frame, (x_first,y_second), 5, (0, 255, 0), -1)
-                    cv2.circle(frame, (x_second,y_second), 3, (255,0, 255), -1)
-                    board_dict[string] = borders_list
-
-        cv2.imshow("Frame", frame)
-        
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+                    cv2.circle(frame, (x_first,y_first), 2, (0, 0, 255), -1)
+                    cv2.circle(frame, (x_second,y_first), 2, (255, 0, 0), -1)
+                    cv2.circle(frame, (x_first,y_second), 2, (0, 255, 0), -1)
+                    cv2.circle(frame, (x_second,y_second), 2, (255,0, 255), -1)
+                    # board_dict[string] = borders_list
             
+            cv2.imshow("Frame", frame)
+            cv2.waitKey(2000)
+            return board_length
+        cv2.imshow("Frame", frame)
+        cv2.waitKey(20)
     cap.release()
     cv2.destroyAllWindows()
 
-board_analyser(cap)
 
-print(board_dict)
+def board_update(cap):
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        
+        frame = undistort_frame(frame) # Assuming this function exists from your code
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            chess_board = frame.copy()    
+            imgray = cv2.cvtColor(chess_board, cv2.COLOR_BGR2GRAY)
+            ret, black_pieces = cv2.threshold(imgray, 40, 255, cv2.THRESH_BINARY_INV)
+            black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            locations = []
+            for i in black_countours:
+                noise = cv2.contourArea(i)
+                if noise > 700:
+                    x, y, width, height = cv2.boundingRect(i)
+                    cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
+                    cv2.circle(chess_board, int(x+(width/2)), int(y+(height/2)), (0, 0, 255), 2)
+                    locations.append((int(x+(width/2)), int(y+(height/2))))
+            cv2.imshow("Main Frame", chess_board)
+            cv2.imshow("black_pieces", black_pieces)
+            cv2.imshow("gray", imgray)
+            cv2.waitKey(2000)
+            cap.release()
+            cv2.destroyAllWindows()
+            return locations
 
-
-
-
-
-
+# x = board_setup(cap)
 
 
 
