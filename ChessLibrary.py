@@ -25,12 +25,11 @@ import chess
 # Works up to depth of 5 or 35000+ nodes
 # Work on Open CV
 
-bot = chess.Board()
-file_path = "output.txt"
+bot = chess.Board() # CAN NOT HAVE
 best_Score_List = []
 best_Moves_List = []
-cnt = [0]
-increment = 0
+cnt = [0] #dont need
+increment = 0 #dont need
 
 # def BestMove(list1,list2):
 #     combined = list(zip(list1,list2))
@@ -39,10 +38,10 @@ increment = 0
 #     list1,list2 = list(list1),list(list2)
 #     return list2[-1]
 
-# def reset():
-#     cnt[0] = 0
-#     best_Score_List.clear()
-#     best_Moves_List.clear()
+def reset():
+    cnt[0] = 0
+    best_Score_List.clear()
+    best_Moves_List.clear()
 
 def InterpetMove(move,moveInSan):
     if move == "O-O-O":
@@ -131,21 +130,25 @@ def minimax(bot, Possible_move,depth,BlackTurn, alpha,beta,firstcall = True): #L
         return 0
     
 
-while not bot.is_checkmate():
-    print(bot)
-    print("Play your Move\nPRESS: SPACE to confirm")
-    x = input()
-    bot.push_san(str(x))
-    if bot.is_checkmate():
-        break
-    # Open CV views object
-    # CV translates this by sending it to 2x2 matrix which then updates the board
-    # MAYBE: Add GUI
-    # Perform Minimax
-    #interepet move
-    bestMove,bestmoveinsan = minimax(bot.legal_moves,3,True,-100000,100000,True)
-    InterpetMove(bestMove,bestmoveinsan)
-print("Game Over!")
+# while not bot.is_checkmate():
+#     print(bot)
+#     print("Play your Move\nPRESS: SPACE to confirm")
+#     x = input()
+#     bot.push_san(str(x))
+#     if bot.is_checkmate():
+#         break
+#     # Open CV views object
+#     # CV translates this by sending it to 2x2 matrix which then updates the board
+#     # MAYBE: Add GUI
+#     # Perform Minimax
+#     #interepet move
+#     bestMove,bestmoveinsan = minimax(bot.legal_moves,3,True,-100000,100000,True)
+#     InterpetMove(bestMove,bestmoveinsan)
+# print("Game Over!")
+
+
+
+
 
 # File write happens after every move:
 # with open(file_path, 'w') as file:

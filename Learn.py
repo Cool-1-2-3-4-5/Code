@@ -37,22 +37,23 @@ def mouse_callback(event, x, y, flags, param):
         click_point = (x, y)
         print(f"Clicked at: {click_point}")
 
-def piece_in_square(middle_of_piece,board_length):
+def piece_in_square(middle_of_piece,board_info):
     letters_array = ['a','b','c','d','e','f','g','h']
     x_pos = middle_of_piece[0]
     y_pos = middle_of_piece[1]
-    top_corner_of_board = board_length[2]
+    top_corner_of_board = board_info[2]
     relative_x_pos = x_pos - top_corner_of_board[0]
     relative_y_pos = y_pos - top_corner_of_board[1]
-    raw_x = relative_x_pos/board_length[0]
-    raw_y = relative_y_pos/board_length[1]
+    raw_x = relative_x_pos/board_info[0]
+    raw_y = relative_y_pos/board_info[1]
     true_pos_x = math.floor(raw_x)
     true_pos_y = math.floor(raw_y)
-    piece = letters_array[true_pos_x] + str(true_pos_y+1)
-    return piece
+    loc = letters_array[true_pos_x] + str(true_pos_y+1)
+    return loc
 
-def eval_board(current_setup_black,previous_setup_black,black_prev_num,black_cur_num):
+def eval_board(current_setup_black,previous_setup_black,black_cur_num,black_prev_num):
     string = ''
+    x = []
     for update in previous_setup_black:
         if update in current_setup_black:
             previous_setup_black.remove(update)
