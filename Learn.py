@@ -42,7 +42,7 @@ def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         click_point = (x, y)
         print(f"Clicked at: {click_point}")
-
+# which square piece is in
 def piece_in_square(middle_of_piece,board_info):
     letters_array = ['a','b','c','d','e','f','g','h']
     x_pos = middle_of_piece[0]
