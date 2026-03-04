@@ -8,8 +8,8 @@ import time
 import random
 
 
-import MovementFunctions
-import ChessLibrary
+# import MovementFunctions
+# import ChessLibrary
 # import ML
 import Learn
 
@@ -26,7 +26,7 @@ cap = vision.VideoCapture(0)
 cap.set(vision.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 
-board_info = Learn.board_setup(cap)
+board_info = Learn.board_setup(cap) #return [width of square, length of square, top left corner pos]
 cap.release()
 vision.destroyAllWindows()
 
@@ -43,21 +43,24 @@ prev_piece_locations = [
 bot = chess.Board()
 white_won = True
 
-# Robot goes first (Rbot is White)
+# Robot goes first (Robot is White)
 legal_moves = list(bot.legal_moves)
 random_index = random.randint(0, len(legal_moves) - 1)
 random_move = legal_moves[random_index]
 bot.push(random_move)
 print("done")
 print(board_info)
+
+# Black and white flip-flop (Robot is White, user is black)
 while not bot.is_checkmate():
     # Black goes
     updated_piece_locations = []
     bestMove_in_UCI = ''
     bestMove_in_SAN = ''
     move_type = ''
+    # return locations (x,y) of black pieces
     updated_pieces = Learn.board_update(cap)
-    # Finding which piece moved
+    # Determining chess piece squares based on (x,y) of pieces
     for piece in updated_pieces:
         updated_piece_locations.append(Learn.piece_in_square(piece,board_info))
     user_move_in_UCI = Learn.eval_board(updated_piece_locations,prev_piece_locations,len(updated_piece_locations),len(prev_piece_locations))
