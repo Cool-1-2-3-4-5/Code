@@ -29,6 +29,12 @@ def undistort_frame(frame):
     dst = dst[y:y+h, x:x+w]
     return dst
 
+def preprocess_frame(frame):
+    "Undistort and rotate frame to orientation: black-top/white-bottom"
+    frame = undistort_frame(frame)
+    frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    return frame
+
 click_point = None
 
 def mouse_callback(event, x, y, flags, param):
@@ -36,7 +42,7 @@ def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         click_point = (x, y)
         print(f"Clicked at: {click_point}")
-
+# which square piece is in
 def piece_in_square(middle_of_piece,board_info):
     letters_array = ['a','b','c','d','e','f','g','h']
     x_pos = middle_of_piece[0]
@@ -74,7 +80,7 @@ def board_setup(cap):
         if not success:
             break
         
-        frame = undistort_frame(frame) # Assuming this function exists from your code
+        frame = preprocess_frame(frame)
 
         # If we have clicked somewhere, draw a circle there
         if click_point is not None:
@@ -123,7 +129,9 @@ def board_setup(cap):
             
             cv2.imshow("Frame", frame)
             cv2.waitKey(2000)
+
             return board_length
+
         cv2.imshow("Frame", frame)
         cv2.waitKey(20)
     cap.release()
@@ -136,7 +144,7 @@ def board_update(cap):
         if not success:
             break
         
-        frame = undistort_frame(frame) # Assuming this function exists from your code
+        frame = preprocess_frame(frame)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
             chess_board = frame.copy()    
