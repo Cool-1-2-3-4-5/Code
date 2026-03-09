@@ -1,8 +1,47 @@
-import gpiozero as Servo
+from gpiozero import AngularServo
+from time import sleep
 
-class newServo(Servo):
-    def move_to_pos(self,degrees):
-        self.val = (degrees/90.0)-1
+# Initialize the servo on GPIO pin 14
+# Adjust min_angle, max_angle, min_pulse_width, max_pulse_width as needed for your servo
+# MG90S typically works well around 0.5 ms to 2.5 ms for ~0° to 180°
+servo = AngularServo(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
 
-rotate = newServo(1)
-rotate.move_to_pos(90)
+def set_angle(angle):
+    """Set the servo to the specified angle (0 to 180 degrees)"""
+    if 0 <= angle <= 180:
+        servo.angle = angle
+    else:
+        print(f"Angle {angle} is out of range (0-180)")
+
+# Main program loop
+print("Servo angle control (0 to 180 degrees)")
+print("Enter 'q' or Ctrl+C to quit")
+
+try:
+    while True:
+        user_input = input("Enter angle (0 to 180): ").strip()
+        
+        if user_input.lower() in ['q', 'quit', 'exit']:
+            print("Exiting...")
+            break
+            
+        try:
+            angle = int(user_input)
+            set_angle(angle)
+            sleep(0.5)  # Small delay to let servo reach position
+        except ValueError:
+            print("Please enter a valid number between 0 and 180")
+            
+except KeyboardInterrupt:
+    print("\nProgram stopped by user")
+
+finally:
+    # Optional: return servo to neutral/center when done
+    servo.angle = 90
+    print("Servo returned to center position")
