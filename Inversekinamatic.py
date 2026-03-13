@@ -1,33 +1,49 @@
 import json
-
+import math
 with open('measurements.json', 'r') as file:
     data = json.load(file)
-main_data = []
-multiplier = 0
-m_data = ["a","b","c","d","e","f","g","h"]
 for key in data:
-    new_data = [0,0,0]
-    multiplier = m_data.index(key[0])
-    multi_sec = int(key[1])-1
-    new_data[0] = round(-9.8 + multi_sec*2.8, 2)
-    new_data[1] = round(11 + multiplier*2.8, 2)
-    new_data[2] = 3.5
-    data[key] = new_data
-print("done")
+    new_data = []
+    square_values = data[key]
+    x = square_values[0]
+    y = square_values[1]
+    z = square_values[2]
+    # xy-plane angle
+    xy_angle_radian = math.atan2(x,y)
+    xy_angle_degrees = math.degrees(xy_angle_radian)
+    xy_angle_degrees = -1 * xy_angle_degrees
+    new_data.append(xy_angle_degrees) # Maingear servo
 
-output_lines = ["{"]
-for rank in range(1, 9):
-    rank_str = str(rank)
-    squares_in_rank = [f"{file}{rank_str}" for file in m_data]
-    rank_entries = [f'"{sq}": {json.dumps(data[sq])}' for sq in squares_in_rank]
-    line = "    " + ", ".join(rank_entries)
-    if rank < 8:
-        line += ","
-    output_lines.append(line)
-output_lines.append("}")
 
-with open('measurements.json', 'w') as file:
-    file.write("\n".join(output_lines))
+
+
+
+# main_data = []
+# multiplier = 0
+# m_data = ["a","b","c","d","e","f","g","h"]
+# for key in data:
+#     new_data = [0,0,0]
+#     multiplier = m_data.index(key[0])
+#     multi_sec = int(key[1])-1
+#     new_data[0] = round(-9.8 + multi_sec*2.8, 2)
+#     new_data[1] = round(11 + multiplier*2.8, 2)
+#     new_data[2] = 3.5
+#     data[key] = new_data
+# print("done")
+
+# output_lines = ["{"]
+# for rank in range(1, 9):
+#     rank_str = str(rank)
+#     squares_in_rank = [f"{file}{rank_str}" for file in m_data]
+#     rank_entries = [f'"{sq}": {json.dumps(data[sq])}' for sq in squares_in_rank]
+#     line = "    " + ", ".join(rank_entries)
+#     if rank < 8:
+#         line += ","
+#     output_lines.append(line)
+# output_lines.append("}")
+
+# with open('measurements.json', 'w') as file:
+#     file.write("\n".join(output_lines))
 
 
 # {
