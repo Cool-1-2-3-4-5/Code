@@ -1,80 +1,48 @@
-import gpiozero as Servo
-import json
+from gpiozero import AngularServo
+from time import sleep
 
-def file_Reader():
-    with open("inversekinematics.json","r") as file:
-        movements = json.load(file)
-    return movements
+def grab_piece(servo,max_angle = 30):
+    servo.angle = max_angle
 
-class newServo(Servo):
-    def move_to_pos(self,degrees):
-        self.val = (degrees/90.0)-1
+def reset_grabber(servo,reset_angle = 0):
+    servo.angle= reset_angle
 
-def reset_servos(rotate,arm,forearm,wrist,grabber):
-    rotate.move_to_pos()
-    arm.move_to_pos()
-    forearm.move_to_pos()
-    wrist.move_to_pos()
-    grabber.move_to_pos()
-
-def drop_to_side(degrees,rotate,arm,forearm,wrist,grabber):
-    rotate.move_to_pos(degrees)
-    arm.move_to_pos(degrees)
-    forearm.move_to_pos(degrees)
-    wrist.move_to_pos(degrees)
-    grabber.move_to_pos(degrees)
+def come_back_to_nor(arm,forearm,wrist,arm_reset = 30,forearm_reset=30,wrist_reset=30):
+    arm.angle = arm_reset
+    forearm.angle = forearm_reset
+    wrist.angle = wrist_reset
+    
+def move_joints(shoulder,arm,forearm,wrist,shoulder_reset,arm_reset,forearm_reset,wrist_reset):
+    shoulder.angle = shoulder_reset
+    arm.angle = arm_reset
+    forearm.angle = forearm_reset
+    wrist.angle = wrist_reset
+    
 
 
-# rotate = newServo(1)
-# main_Arm = newServo(2)
-# arm = newServo(3)
-# grabber = newServo(4)
-
-def robotTurnToPlay(move_type,move_to_play,rotate,arm,forearm,wrist,grabber,movesDict):
-
-    # Case 1: If just move a piece
-    if move_type == "Regular":
-        gotopos = move_to_play[0] + move_to_play[1]
-        rotate.move_to_pos((movesDict[gotopos])[0])
-        arm.move_to_pos((movesDict[gotopos])[1])
-        forearm.move_to_pos((movesDict[gotopos])[2])
-        wrist.move_to_pos((movesDict[newpos])[3])
-        grabber.move_to_pos(180)
-
-        newpos = move_to_play[2] + move_to_play[3]
-        rotate.move_to_pos((movesDict[newpos])[0])
-        arm.move_to_pos((movesDict[newpos])[1])
-        forearm.move_to_pos((movesDict[newpos])[2])
-        wrist.move_to_pos((movesDict[newpos])[3])
-        grabber.move_to_pos(0)
-
-        reset_servos()
-        
-    # Case 2: If wins
-    elif move_type == "Piece Won":
-        gotopos = move_to_play[2] + move_to_play[3]
-        rotate.move_to_pos((movesDict[gotopos])[0])
-        arm.move_to_pos((movesDict[gotopos])[1])
-        forearm.move_to_pos((movesDict[gotopos])[2])
-        wrist.move_to_pos((movesDict[newpos])[3])
-        grabber.move_to_pos(180)
-
-        drop_to_side(200)
-
-        newpos = move_to_play[0] + move_to_play[1]
-        rotate.move_to_pos((movesDict[newpos])[0])
-        arm.move_to_pos((movesDict[newpos])[1])
-        forearm.move_to_pos((movesDict[newpos])[2])
-        wrist.move_to_pos((movesDict[newpos])[3])
-        grabber.move_to_pos(0)
-
-        reset_servos()
-
-    # Case 3.1: Kingside Castle SKIP FOR NOW
-    elif move_type == "Kingside":
-        pass
-
-    # Case 3.2: Queenside Castle SKIP FOR NOW
-    else:
-        pass
-
+def robotTurnToPlay(move_type, shoulder, arm, forearm, wrist, gripper, go_to_pos, return_to_pos):
+    if move_type == "Piece Won":
+        move_joints(shoulder,arm,forearm,wrist,return_to_pos[0],return_to_pos[1],return_to_pos[2],return_to_pos[3])
+        grab_piece(gripper)
+        sleep(0.5)
+        come_back_to_nor(arm, forearm, wrist)
+        sleep(0.5)
+        move_joints(shoulder,arm,forearm,wrist,30,30,30,30)
+        sleep(0.5)
+        reset_grabber(gripper)
+        sleep(0.5)
+        move_joints(shoulder,arm,forearm,wrist,go_to_pos[0],go_to_pos[1],go_to_pos[2],go_to_pos[3])
+        grab_piece(gripper)
+        sleep(0.5)
+        come_back_to_nor(arm,forearm,wrist)
+        sleep(0.5)
+        move_joints(shoulder,arm,forearm,wrist,return_to_pos[0],return_to_pos[1],return_to_pos[2],return_to_pos[3])
+        reset_grabber(gripper)
+    else:    
+        move_joints(shoulder,arm,forearm,wrist,go_to_pos[0],go_to_pos[1],go_to_pos[2],go_to_pos[3])
+        grab_piece(gripper)
+        sleep(0.5)
+        come_back_to_nor(arm, forearm, wrist)
+        sleep(0.5)
+        move_joints(shoulder,arm,forearm,wrist,return_to_pos[0],return_to_pos[1],return_to_pos[2],return_to_pos[3])
+        reset_grabber(gripper)

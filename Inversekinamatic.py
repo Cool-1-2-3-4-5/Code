@@ -2,8 +2,8 @@ import json
 import math
 with open('measurements.json', 'r') as file:
     data = json.load(file)
+new_data = []
 for key in data:
-    new_data = []
     square_values = data[key]
     x = square_values[0]
     y = square_values[1]
@@ -12,8 +12,11 @@ for key in data:
     xy_angle_radian = math.atan2(x,y)
     xy_angle_degrees = math.degrees(xy_angle_radian)
     xy_angle_degrees = -1 * xy_angle_degrees
-    new_data.append(xy_angle_degrees) # Maingear servo
-
+    new_data.append(90-xy_angle_degrees) # Maingear servo
+    if "b" in key:
+        print(key + " " + str(90-xy_angle_degrees))
+new_data.sort()
+print(str(new_data[0]) + " " + str(new_data[-1])) # use these to set max and min abnlges of servos
 
 
 
