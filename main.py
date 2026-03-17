@@ -1,17 +1,55 @@
 import chess
-# import gpiozero as Servo
+from gpiozero import AngularServo
 import json
 # import os
 # os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2 as vision
 import time
+from time import sleep
 import random
-
-
-# import MovementFunctions
-# import ChessLibrary
+import MovementFunctions
+import ChessLibrary
 # import ML
 import Learn
+
+with open('inversekinematics.json', 'r') as file:
+    motor_positions = json.load(file)
+
+shoulder = AngularServo(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
+arm = AngularServo(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
+forearm = AngularServo(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
+wrist = AngularServo(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
+gripper = AngularServo(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
 
 print("Welcome to the Robot vs Human Chess Game, White to go first, once turn is done press 'space bar' to ensure you final move is confirmed")
 print("LETS START THE GAME IN 5 SECONDS")
@@ -81,7 +119,9 @@ while not bot.is_checkmate():
             move_type = "Regular"
         # movement control: Run Robot movement
         #ADD SERVOS
-        MovementFunctions.robotTurnToPlay(move_type,bestMove_in_UCI,rotate,arm,forearm,wrist,grabber,motor_positions)
+        go_to_pos = motor_positions[bestMove_in_UCI[0]+bestMove_in_UCI[1]]
+        return_to_pos = motor_positions[bestMove_in_UCI[2]+bestMove_in_UCI[3]]
+        MovementFunctions.robotTurnToPlay(move_type, shoulder, arm, forearm, wrist, gripper,go_to_pos,return_to_pos)
         pass
     else:
         white_won = False
