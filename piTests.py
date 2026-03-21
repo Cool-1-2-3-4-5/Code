@@ -1,5 +1,9 @@
-from gpiozero import AngularServo
+from gpiozero import Device, AngularServo
+from gpiozero.pins.pigpio import PiGPIOFactory
 from time import sleep
+
+# Set up pigpio pin factory for hardware PWM (reduces servo jitter)
+Device.pin_factory = PiGPIOFactory()
 
 # Initialize the servo on GPIO pin 14
 # Adjust min_angle, max_angle, min_pulse_width, max_pulse_width as needed for your servo
@@ -12,10 +16,25 @@ servo = AngularServo(
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 
-def set_angle(angle):
-    """Set the servo to the specified angle (0 to 180 degrees)"""
+def set_angle(angle, step_size=1, delay=0.2):
     if 0 <= angle <= 180:
-        servo.angle = angle
+        if servo.angle is not None:
+            current_angle = servo.angle
+        else:
+            current_angle = 90
+        
+        if current_angle < angle:
+            # Move up
+            while current_angle < angle:
+                current_angle = min(current_angle + step_size, angle)
+                servo.angle = current_angle
+                sleep(delay)
+        else:
+            # Move down
+            while current_angle > angle:
+                current_angle = max(current_angle - step_size, angle)
+                servo.angle = current_angle
+                sleep(delay)
     else:
         print(f"Angle {angle} is out of range (0-180)")
 
@@ -43,5 +62,5 @@ except KeyboardInterrupt:
 
 finally:
     # Optional: return servo to neutral/center when done
-    servo.angle = 90
+    set_angle(90)
     print("Servo returned to center position")

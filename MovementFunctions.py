@@ -1,22 +1,42 @@
 from gpiozero import AngularServo
 from time import sleep
 
-def grab_piece(servo,max_angle = 30):
-    servo.angle = max_angle
-
-def reset_grabber(servo,reset_angle = 0):
-    servo.angle= reset_angle
-
-def come_back_to_nor(arm,forearm,wrist,arm_reset = 30,forearm_reset=30,wrist_reset=30):
-    arm.angle = arm_reset
-    forearm.angle = forearm_reset
-    wrist.angle = wrist_reset
+def smooth_set_angle(servo, target_angle, step_size=1, delay=0.05):
+    if not (0 <= target_angle <= 180):
+        return
     
-def move_joints(shoulder,arm,forearm,wrist,shoulder_reset,arm_reset,forearm_reset,wrist_reset):
-    shoulder.angle = shoulder_reset
-    arm.angle = arm_reset
-    forearm.angle = forearm_reset
-    wrist.angle = wrist_reset
+    if servo.angle is not None:
+        current_angle = servo.angle
+    else:
+        current_angle = 90
+    
+    if current_angle < target_angle:
+        while current_angle < target_angle:
+            current_angle = min(current_angle + step_size, target_angle)
+            servo.angle = current_angle
+            sleep(delay)
+    else:
+        while current_angle > target_angle:
+            current_angle = max(current_angle - step_size, target_angle)
+            servo.angle = current_angle
+            sleep(delay)
+
+def grab_piece(servo, max_angle=30):
+    smooth_set_angle(servo, max_angle)
+
+def reset_grabber(servo, reset_angle=0):
+    smooth_set_angle(servo, reset_angle)
+
+def come_back_to_nor(arm, forearm, wrist, arm_reset=30, forearm_reset=30, wrist_reset=30):
+    smooth_set_angle(arm, arm_reset)
+    smooth_set_angle(forearm, forearm_reset)
+    smooth_set_angle(wrist, wrist_reset)
+    
+def move_joints(shoulder, arm, forearm, wrist, shoulder_reset, arm_reset, forearm_reset, wrist_reset):
+    smooth_set_angle(shoulder, shoulder_reset)
+    smooth_set_angle(arm, arm_reset)
+    smooth_set_angle(forearm, forearm_reset)
+    smooth_set_angle(wrist, wrist_reset)
     
 
 

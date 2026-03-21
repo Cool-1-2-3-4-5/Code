@@ -1,6 +1,10 @@
 import chess
-from gpiozero import AngularServo
+from gpiozero import Device, AngularServo
+from gpiozero.pins.pigpio import PiGPIOFactory
 import json
+
+# Set up pigpio pin factory for hardware PWM (reduces servo jitter)
+Device.pin_factory = PiGPIOFactory()
 # import os
 # os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2 as vision
