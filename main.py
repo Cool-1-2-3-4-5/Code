@@ -2,7 +2,7 @@ import chess
 from gpiozero import Device, AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 import json
-
+import tkinter as tk
 # Set up pigpio pin factory for hardware PWM (reduces servo jitter)
 Device.pin_factory = PiGPIOFactory()
 # import os
@@ -15,6 +15,7 @@ import MovementFunctions
 import ChessLibrary
 # import ML
 import Learn
+import View
 
 with open('inversekinematics.json', 'r') as file:
     motor_positions = json.load(file)
