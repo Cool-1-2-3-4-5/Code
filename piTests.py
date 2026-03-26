@@ -1,66 +1,146 @@
 from gpiozero import Device, AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from time import sleep
+import json
 
-# Set up pigpio pin factory for hardware PWM (reduces servo jitter)
 Device.pin_factory = PiGPIOFactory()
 
-# Initialize the servo on GPIO pin 14
-# Adjust min_angle, max_angle, min_pulse_width, max_pulse_width as needed for your servo
-# MG90S typically works well around 0.5 ms to 2.5 ms for ~0° to 180°
-servo = AngularServo(
-    23,
+# Read measurements.json and output to data array
+with open('inversekinematics.json', 'r') as f:
+    data = json.load(f)
+
+hub = AngularServo(
+    17,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 
-def set_angle(angle, step_size=1, delay=0.2):
-    if 0 <= angle <= 180:
-        if servo.angle is not None:
-            current_angle = servo.angle
-        else:
-            current_angle = 90
-        
-        if current_angle < angle:
-            # Move up
-            while current_angle < angle:
-                current_angle = min(current_angle + step_size, angle)
-                servo.angle = current_angle
-                sleep(delay)
-        else:
-            # Move down
-            while current_angle > angle:
-                current_angle = max(current_angle - step_size, angle)
-                servo.angle = current_angle
-                sleep(delay)
-    else:
-        print(f"Angle {angle} is out of range (0-180)")
+arm = AngularServo(
+    27,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
 
+forearm = AngularServo(
+    22,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
+
+wrist = AngularServo(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
+def reset_angles():
+    hub.angle = 0
+    arm.angle = 0
+    forearm.angle = 0
+    wrist.angle = 0
+    
+def set_angle(hub_deg, arm_deg, forearm_deg, wrist_deg, step_size=1, delay=0.01):
+    # Move hub
+    if hub.angle is not None:
+        current_hub = hub.angle
+    else:
+        current_hub = 90
+    
+    if current_hub < hub_deg:
+        while current_hub < hub_deg:
+            current_hub = min(current_hub + step_size, hub_deg)
+            hub.angle = current_hub
+            sleep(delay)
+    else:
+        while current_hub > hub_deg:
+            current_hub = max(current_hub - step_size, hub_deg)
+            hub.angle = current_hub
+            sleep(delay)
+    
+    # Move arm
+    if arm.angle is not None:
+        current_arm = arm.angle
+    else:
+        current_arm = 90
+    
+    if current_arm < arm_deg:
+        while current_arm < arm_deg:
+            current_arm = min(current_arm + step_size, arm_deg)
+            arm.angle = current_arm
+            sleep(delay)
+    else:
+        while current_arm > arm_deg:
+            current_arm = max(current_arm - step_size, arm_deg)
+            arm.angle = current_arm
+            sleep(delay)
+    
+    # Move forearm
+    if forearm.angle is not None:
+        current_forearm = forearm.angle
+    else:
+        current_forearm = 90
+    
+    if current_forearm < forearm_deg:
+        while current_forearm < forearm_deg:
+            current_forearm = min(current_forearm + step_size, forearm_deg)
+            forearm.angle = current_forearm
+            sleep(delay)
+    else:
+        while current_forearm > forearm_deg:
+            current_forearm = max(current_forearm - step_size, forearm_deg)
+            forearm.angle = current_forearm
+            sleep(delay)
+    
+    # Move wrist
+    if wrist.angle is not None:
+        current_wrist = wrist.angle
+    else:
+        current_wrist = 90
+    
+    if current_wrist < wrist_deg:
+        while current_wrist < wrist_deg:
+            current_wrist = min(current_wrist + step_size, wrist_deg)
+            wrist.angle = current_wrist
+            sleep(delay)
+    else:
+        while current_wrist > wrist_deg:
+            current_wrist = max(current_wrist - step_size, wrist_deg)
+            wrist.angle = current_wrist
+            sleep(delay)
+    
 # Main program loop
-print("Servo angle control (0 to 180 degrees)")
 print("Enter 'q' or Ctrl+C to quit")
 
 try:
+    print("Resetting servos")
+    reset_angles()
+    sleep(5)
+    print("configure and start")
     while True:
-        user_input = input("Enter angle (0 to 180): ").strip()
+        user_input = input("Enter position: ")
         
         if user_input.lower() in ['q', 'quit', 'exit']:
             print("Exiting...")
             break
             
         try:
-            angle = int(user_input)
-            set_angle(angle)
+            movement = [90,0,0,0]
+            set_angle(movement[0], movement[1], movement[2], movement[3])
             sleep(0.5)  # Small delay to let servo reach position
-        except ValueError:
-            print("Please enter a valid number between 0 and 180")
+        except KeyError:
+            print("Please enter a valid chess position (a1-h8)")
             
 except KeyboardInterrupt:
     print("\nProgram stopped by user")
 
 finally:
     # Optional: return servo to neutral/center when done
-    set_angle(90)
+    set_angle(90, 90, 90, 90)
     print("Servo returned to center position")
