@@ -4,6 +4,7 @@ import cv2 as cv2
 import numpy as np
 import time
 import math
+
 # Calibration Data
 cameraMatrix = np.array([
     [727.84220328, 0., 354.16226615],
@@ -53,8 +54,8 @@ def piece_in_square(middle_of_piece,board_info):
     true_pos_x = math.floor(raw_x)
     true_pos_y = math.floor(raw_y)
     if 0 <= true_pos_x <= 7 and 0 <= true_pos_y <=7:
-        loc = letters_array[true_pos_x] + str(true_pos_y+1)
-    return loc
+        loc = letters_array[true_pos_x] + str(8-true_pos_y)
+        return loc
 
 def eval_board(current_setup_black,previous_setup_black,black_cur_num,black_prev_num):
     string = ''
@@ -171,12 +172,12 @@ def board_update(cap, board_info=None):
             analysis_frame = frame.copy()
             chess_board = analysis_frame.copy()
             imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
-            ret, black_pieces = cv2.threshold(imgray, 90, 255, cv2.THRESH_BINARY_INV)
+            ret, black_pieces = cv2.threshold(imgray, 40, 255, cv2.THRESH_BINARY_INV)
             black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             locations = []
             for i in black_countours:
                 noise = cv2.contourArea(i)
-                if 400 < noise < 700:
+                if 100 < noise < 7000:
                     x, y, width, height = cv2.boundingRect(i)
                     cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
                     cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
@@ -194,12 +195,14 @@ def board_update(cap, board_info=None):
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
-    print("HI")
+    print("HiI")
     main = board_setup(cap)
     locations = board_update(cap, main)
     setup = []
     for mid in locations:
-        setup.append(piece_in_square(mid,main))
+        location = piece_in_square(mid,main)
+        if location is not None:
+            setup.append(location)
     print(setup)
 
 
