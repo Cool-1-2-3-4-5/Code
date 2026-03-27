@@ -1,10 +1,9 @@
 import os
-os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+# os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "1"
 import cv2 as cv2
 import numpy as np
 import time
 import math
-cap = cv2.VideoCapture(0)
 # Calibration Data
 cameraMatrix = np.array([
     [727.84220328, 0., 354.16226615],
@@ -67,6 +66,27 @@ def eval_board(current_setup_black,previous_setup_black,black_cur_num,black_prev
             string += update
     string += current_setup_black[0]
     return string
+
+def draw_board_grid_overlay(frame, board_info):
+    if not board_info or len(board_info) < 3:
+        return frame
+
+    delta_x = board_info[0]
+    delta_y = board_info[1]
+    top_left = board_info[2]
+
+    x_start = int(top_left[0])
+    y_start = int(top_left[1])
+    x_end = int(x_start + (8 * delta_x))
+    y_end = int(y_start + (8 * delta_y))
+
+    for idx in range(9):
+        x = int(x_start + (idx * delta_x))
+        y = int(y_start + (idx * delta_y))
+        cv2.line(frame, (x, y_start), (x, y_end), (255, 255, 0), 1)
+        cv2.line(frame, (x_start, y), (x_end, y), (255, 255, 0), 1)
+
+    return frame
 
 def board_setup(cap):
     cv2.namedWindow("Frame")
@@ -136,7 +156,7 @@ def board_setup(cap):
     cap.release()
     cv2.destroyAllWindows()
 
-def board_update(cap):
+def board_update(cap, board_info=None):
     while True:
         success, frame = cap.read()
         if not success:
@@ -145,30 +165,44 @@ def board_update(cap):
         frame = preprocess_frame(frame)
         cv2.imshow("Board Preview", frame)
         
-        chess_board = frame.copy()    
-        imgray = cv2.cvtColor(chess_board, cv2.COLOR_BGR2GRAY)
-        ret, black_pieces = cv2.threshold(imgray, 90, 255, cv2.THRESH_BINARY_INV)
-        black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        locations = []
-        for i in black_countours:
-            noise = cv2.contourArea(i)
-            if noise > 700:
-                x, y, width, height = cv2.boundingRect(i)
-                cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
-                cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
-                locations.append((int(x+(width/2)), int(y+(height/2))))
-        cv2.imshow("/home/elil/Desktop/images save/Main Frame.jpg", chess_board)
-        cv2.imshow("/home/elil/Desktop/images save/black_pieces.jpg", black_pieces)
-        cv2.imshow("/home/elil/Desktop/images save/gray.jpg", imgray)
-        cv2.waitKey(200)
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            cv2.waitKey(1000)
+            # Keep analysis frame clean (no overlay) for threshold and contour detection.
+            analysis_frame = frame.copy()
+            chess_board = analysis_frame.copy()
+            imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
+            ret, black_pieces = cv2.threshold(imgray, 90, 255, cv2.THRESH_BINARY_INV)
+            black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            locations = []
+            for i in black_countours:
+                noise = cv2.contourArea(i)
+                if 400 < noise < 700:
+                    x, y, width, height = cv2.boundingRect(i)
+                    cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
+                    cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
+                    locations.append((int(x+(width/2)), int(y+(height/2))))
+
+            # Overlay grid only after analysis, as a user reference.
+            draw_board_grid_overlay(chess_board, board_info)
+            cv2.imshow("/home/elil/Desktop/images save/Main Frame.jpg", chess_board)
+            cv2.imshow("/home/elil/Desktop/images save/black_pieces.jpg", black_pieces)
+            cv2.imshow("/home/elil/Desktop/images save/gray.jpg", imgray)
+            cv2.waitKey(10000)
             cap.release()
             cv2.destroyAllWindows()
             return locations
 
-x = board_update(cap)
-print(x)
+if __name__ == "__main__":
+    cap = cv2.VideoCapture(0)
+    print("HI")
+    main = board_setup(cap)
+    locations = board_update(cap, main)
+    setup = []
+    for mid in locations:
+        setup.append(piece_in_square(mid,main))
+    print(setup)
+
+
+
 
 
 

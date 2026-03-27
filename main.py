@@ -102,7 +102,7 @@ while not bot.is_checkmate():
     bestMove_in_SAN = ''
     move_type = ''
     # return locations (x,y) of black pieces
-    updated_pieces = Learn.board_update(cap)
+    updated_pieces = Learn.board_update(cap, board_info)
     # Determining chess piece squares based on (x,y) of pieces
     for piece in updated_pieces:
         updated_piece_locations.append(Learn.piece_in_square(piece,board_info))
