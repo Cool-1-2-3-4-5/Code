@@ -41,12 +41,12 @@ wrist = AngularServo(
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 def reset_angles():
-    hub.angle = 0
+    hub.angle = 180
     arm.angle = 0
-    forearm.angle = 0
-    wrist.angle = 0
+    forearm.angle = 180
+    wrist.angle = 180
     
-def set_angle(hub_deg, arm_deg, forearm_deg, wrist_deg, step_size=1, delay=0.01):
+def set_angle(hub_deg, arm_deg, forearm_deg, wrist_deg, step_size=0.3, delay=0.01):
     # Move hub
     if hub.angle is not None:
         current_hub = hub.angle
@@ -116,7 +116,7 @@ def set_angle(hub_deg, arm_deg, forearm_deg, wrist_deg, step_size=1, delay=0.01)
             sleep(delay)
     
 # Main program loop
-print("Enter 'q' or Ctrl+C to quit")
+print("Enter1 'q' or Ctrl+C to quit")
 
 try:
     print("Resetting servos")
@@ -131,7 +131,7 @@ try:
             break
             
         try:
-            movement = [90,0,0,0]
+            movement = data[user_input]
             set_angle(movement[0], movement[1], movement[2], movement[3])
             sleep(0.5)  # Small delay to let servo reach position
         except KeyError:
@@ -142,5 +142,5 @@ except KeyboardInterrupt:
 
 finally:
     # Optional: return servo to neutral/center when done
-    set_angle(90, 90, 90, 90)
+    reset_angles()
     print("Servo returned to center position")
