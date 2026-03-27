@@ -52,7 +52,8 @@ def piece_in_square(middle_of_piece,board_info):
     raw_y = relative_y_pos/board_info[1]
     true_pos_x = math.floor(raw_x)
     true_pos_y = math.floor(raw_y)
-    loc = letters_array[true_pos_x] + str(true_pos_y+1)
+    if 0 <= true_pos_x <= 7 and 0 <= true_pos_y <=7:
+        loc = letters_array[true_pos_x] + str(true_pos_y+1)
     return loc
 
 def eval_board(current_setup_black,previous_setup_black,black_cur_num,black_prev_num):
