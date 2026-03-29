@@ -216,23 +216,23 @@ def board_update(cap,board_info):
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     print("Starting chess board detection...")
+    main = board_update(cap)
+    # try:
+    #     # Load pre-calibrated board info from file
+    #     main = load_board_calibration()
+    # except FileNotFoundError:
+    #     print("ERROR: board_calibration.json not found!")
+    #     print("Run this script with HEADLESS=False on a display-enabled machine first to calibrate.")
+    #     exit(1)
     
-    try:
-        # Load pre-calibrated board info from file
-        main = load_board_calibration()
-    except FileNotFoundError:
-        print("ERROR: board_calibration.json not found!")
-        print("Run this script with HEADLESS=False on a display-enabled machine first to calibrate.")
-        exit(1)
-    
-    locations = board_update(cap, main)
-    setup = []
-    for mid in locations:
-        location = piece_in_square(mid,main)
-        if location is not None:
-            if location not in setup:
-                 setup.append(location)
-    print(setup)
+    # locations = board_update(cap, main)
+    # setup = []
+    # for mid in locations:
+    #     location = piece_in_square(mid,main)
+    #     if location is not None:
+    #         if location not in setup:
+    #              setup.append(location)
+    # print(setup)
 
 
 
