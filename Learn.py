@@ -202,7 +202,8 @@ if __name__ == "__main__":
     for mid in locations:
         location = piece_in_square(mid,main)
         if location is not None:
-            setup.append(location)
+            if location not in setup:
+                 setup.append(location)
     print(setup)
 
 
