@@ -4,7 +4,6 @@ import cv2 as cv2
 import numpy as np
 import time
 import math
-import json
 
 # Calibration Data
 cameraMatrix = np.array([
@@ -30,6 +29,7 @@ def undistort_frame(frame):
     return dst
 
 def preprocess_frame(frame):
+    "Undistort and rotate frame to orientation: black-top/white-bottom"
     frame = undistort_frame(frame)
     frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
     return frame
@@ -41,7 +41,6 @@ def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         click_point = (x, y)
         print(f"Clicked at: {click_point}")
-
 # which square piece is in
 def piece_in_square(middle_of_piece,board_info):
     letters_array = ['a','b','c','d','e','f','g','h']
@@ -58,34 +57,17 @@ def piece_in_square(middle_of_piece,board_info):
         loc = letters_array[true_pos_x] + str(8-true_pos_y)
         return loc
 
-def eval_board(prev_setup_main,current_setup_main):
-    prev_setup = prev_setup_main.copy()
-    current_setup = current_setup_main.copy()
+def eval_board(current_setup_black,previous_setup_black,black_cur_num,black_prev_num):
     string = ''
     x = []
-    for update in prev_setup:
-        if update in current_setup:
-            prev_setup.remove(update)
-            current_setup.remove(update)
+    for update in previous_setup_black:
+        if update in current_setup_black:
+            previous_setup_black.remove(update)
+            current_setup_black.remove(update)
         else: #updated move
             string += update
-    string += current_setup[0]
+    string += current_setup_black[0]
     return string
-
-def save_board_calibration(board_info, filename="board_calibration.json"):
-    data = {
-        "delta_x": float(board_info[0]),
-        "delta_y": float(board_info[1]),
-        "top_left": list(board_info[2])
-    }
-    with open(filename, 'w') as f:
-        json.dump(data, f)
-
-def load_board_calibration(filename="board_calibration.json"):
-    with open(filename, 'r') as f:
-        data = json.load(f)
-    board_info = [data["delta_x"], data["delta_y"], tuple(data["top_left"])]
-    return board_info
 
 def draw_board_grid_overlay(frame, board_info):
     if not board_info or len(board_info) < 3:
@@ -168,8 +150,6 @@ def board_setup(cap):
             
             cv2.imshow("Frame", frame)
             cv2.waitKey(2000)
-            
-            save_board_calibration(board_length)
 
             return board_length
 
@@ -178,53 +158,45 @@ def board_setup(cap):
     cap.release()
     cv2.destroyAllWindows()
 
-def board_update(cap,board_info):
-    print("press any key to update board")
-    input()
-    success, frame = cap.read()
-    if not success:
-        return
-    
-    frame = preprocess_frame(frame)
-    analysis_frame = frame.copy()
-    chess_board = analysis_frame.copy()
-    imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
-    ret, black_pieces = cv2.threshold(imgray, 40, 255, cv2.THRESH_BINARY_INV)
-    black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    locations = []
-    for i in black_countours:
-        noise = cv2.contourArea(i)
-        if 100 < noise < 7000:
-            x, y, width, height = cv2.boundingRect(i)
-            cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
-            cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
-            locations.append((int(x+(width/2)), int(y+(height/2))))
+def board_update(cap, board_info=None):
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        
+        frame = preprocess_frame(frame)
+        cv2.imshow("Board Preview", frame)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            # Keep analysis frame clean (no overlay) for threshold and contour detection.
+            analysis_frame = frame.copy()
+            chess_board = analysis_frame.copy()
+            imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
+            ret, black_pieces = cv2.threshold(imgray, 40, 255, cv2.THRESH_BINARY_INV)
+            black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            locations = []
+            for i in black_countours:
+                noise = cv2.contourArea(i)
+                if 100 < noise < 7000:
+                    x, y, width, height = cv2.boundingRect(i)
+                    cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
+                    cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
+                    locations.append((int(x+(width/2)), int(y+(height/2))))
 
-    # Overlay grid only after analysis, as a user reference.
-    draw_board_grid_overlay(chess_board, board_info)
-    
-    # Save or display results
-    cv2.imwrite("images_save/Main_Frame.jpg", chess_board)
-    cv2.imwrite("images_save/black_pieces.jpg", black_pieces)
-    cv2.imwrite("images_save/gray.jpg", imgray)
-    print("Analysis frames saved to images_save/")
-    
-    cap.release()
-    return locations
-    
-    
+            # Overlay grid only after analysis, as a user reference.
+            draw_board_grid_overlay(chess_board, board_info)
+            cv2.imshow("/home/elil/Desktop/images save/Main Frame.jpg", chess_board)
+            cv2.imshow("/home/elil/Desktop/images save/black_pieces.jpg", black_pieces)
+            cv2.imshow("/home/elil/Desktop/images save/gray.jpg", imgray)
+            cv2.waitKey(10000)
+            cap.release()
+            cv2.destroyAllWindows()
+            return locations
+
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
-    print("Starting chess board detection...")
-    
-    try:
-        # Load pre-calibrated board info from file
-        main = load_board_calibration()
-    except FileNotFoundError:
-        print("ERROR: board_calibration.json not found!")
-        print("Run this script with HEADLESS=False on a display-enabled machine first to calibrate.")
-        exit(1)
-    
+    print("HiI")
+    main = board_setup(cap)
     locations = board_update(cap, main)
     setup = []
     for mid in locations:

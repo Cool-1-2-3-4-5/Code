@@ -64,6 +64,7 @@ cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 board_info = Learn.board_setup(cap) #return [width of square, length of square, top left corner pos]
 cap.release()
 vision.destroyAllWindows()
+main = Learn.load_board_calibration()
 
 # Motor movements
 motor_positions = []
@@ -94,7 +95,7 @@ gui.setboard(bot)
 gui.root.update()
 gui.delay(2)
 
-
+main
 # GAME LOOP
 
 # Robot goes first (Robot is White)
@@ -113,12 +114,18 @@ while not bot.is_checkmate():
     move_type = ''
 
     # return locations (x,y) of black pieces
-    updated_pieces = Learn.board_update(cap, board_info)
+    locations = Learn.board_update(cap, board_info)
+    setup = []
+    for mid in locations:
+        location = Learn.piece_in_square(mid,main)
+        if location is not None:
+            if location not in setup:
+                 setup.append(location)
+    
 
     # Determining chess piece squares based on (x,y) of pieces
-    for piece in updated_pieces:
-        updated_piece_locations.append(Learn.piece_in_square(piece,board_info))
-    user_move_in_UCI = Learn.eval_board(updated_piece_locations,prev_piece_locations,len(updated_piece_locations),len(prev_piece_locations))
+    user_move_in_UCI = Learn.eval_board(prev_piece_locations,setup)
+    prev_piece_locations = setup
     if chess.Move.from_uci(user_move_in_UCI) in bot.legal_moves:
         bot.push_uci(user_move_in_UCI)
     else: # ADD HERE TO ALLOW FOR USER TO FIX THEIR MOVE
@@ -137,6 +144,8 @@ while not bot.is_checkmate():
         # Find if best move captures or just moves piece
         if 'x' in bestMove_in_SAN: #Capture
             move_type = "Piece Won"
+            remove_move = str(bestMove_in_UCI[-2]) + str(bestMove_in_UCI[-1])
+            prev_piece_locations.remove(remove_move)
         else:
             move_type = "Regular"
 
