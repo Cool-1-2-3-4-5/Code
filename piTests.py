@@ -10,26 +10,22 @@ with open('inversekinematics.json', 'r') as f:
     data = json.load(f)
 
 class Mover(AngularServo):
-    def set_angle(self, degrees, speed_dps=20.0, update_interval=0.03, min_step=0.8):
+    def set_angle(self,degrees,step_size=0.3, delay=0.01):
         if self.angle is not None:
-            current_angle = float(self.angle)
+            current_angle = self.angle
         else:
-            current_angle = 90.0
+            current_angle = 90
 
-        target_angle = float(degrees)
-        step = max(float(min_step), float(speed_dps) * float(update_interval))
-
-        if current_angle < target_angle:
-            while current_angle < target_angle:
-                current_angle = min(current_angle + step, target_angle)
+        if current_angle < degrees:
+            while current_angle < degrees:
+                current_angle = min(current_angle + step_size, degrees)
                 self.angle = current_angle
-                sleep(update_interval)
+                sleep(delay)
         else:
-            while current_angle > target_angle:
-                current_angle = max(current_angle - step, target_angle)
-                self.angle = current_angle
-                sleep(update_interval)
-arm = Mover(
+            while current_angle > degrees:
+                current_angle = max(current_angle - step_size, degrees)
+                sleep(delay)
+hub = Mover(
     17,
     min_angle=0,
     max_angle=180,
@@ -37,35 +33,35 @@ arm = Mover(
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 
-# arm = Mover(
-#     27,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width=0.5 / 1000,    # 0.5 ms
-#     max_pulse_width=2.5 / 1000     # 2.5 ms
-# )
+arm = Mover(
+    27,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
 
-# forearm = Mover(
-#     22,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width=0.5 / 1000,    # 0.5 ms
-#     max_pulse_width=2.5 / 1000     # 2.5 ms
-# )
+forearm = Mover(
+    22,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
 
-# wrist = Mover(
-#     23,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width=0.5 / 1000,    # 0.5 ms
-#     max_pulse_width=2.5 / 1000     # 2.5 ms
-# )
+wrist = Mover(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width=0.5 / 1000,    # 0.5 ms
+    max_pulse_width=2.5 / 1000     # 2.5 ms
+)
 
 def reset_angles():
-    # hub.angle = 180
-    arm.angle = 180
-    # forearm.angle = 180
-    # wrist.angle = 180
+    hub.set_angle(180)
+    arm.set_angle(180)
+    forearm.set_angle(180)
+    wrist.set_angle(180)
 
 
 # Main program loop
