@@ -59,13 +59,13 @@ wrist = Mover(
 
 def reset_angles():
     hub.set_angle(180)
-    arm.set_angle(180)
+    arm.set_angle(120)
     forearm.set_angle(180)
     wrist.set_angle(180)
 
 
 # Main program loop
-print("Enter2sss13 'q' or Ctrl+C to quit")
+print("RUN 'q' or Ctrl+C to quit")
 
 try:
     print("Resetting servos")
