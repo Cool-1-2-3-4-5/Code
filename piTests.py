@@ -2,6 +2,7 @@ from gpiozero import Device, AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from time import sleep
 import json
+import json
 
 Device.pin_factory = PiGPIOFactory()
 
@@ -73,7 +74,12 @@ try:
     reset_angles()
     sleep(5)
     print("configure and start")
+    print("Resetting servos")
+    reset_angles()
+    sleep(5)
+    print("configure and start")
     while True:
+        user_input = input("Enter position: ")
         user_input = input("Enter position: ")
         
         if user_input.lower() in ['q', 'quit', 'exit']:
@@ -89,6 +95,8 @@ try:
             sleep(0.5)  # Small delay to let servo reach position
         except KeyError:
             print("Please enter a valid chess position (a1-h8)")
+        except KeyError:
+            print("Please enter a valid chess position (a1-h8)")
             
 except KeyboardInterrupt:
     print("\nProgram stopped by user")
@@ -96,4 +104,6 @@ except KeyboardInterrupt:
 finally:
     # Optional: return servo to neutral/center when done
     reset_angles()
+    reset_angles()
     print("Servo returned to center position")
+

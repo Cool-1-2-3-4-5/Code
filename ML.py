@@ -58,11 +58,6 @@ def board_analyser(cap):
             if noise > 700:
                 x, y, width, height = cv2.boundingRect(i)
                 cv2.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
-        # for j in white_countours:
-        #     noise = cv2.contourArea(i)
-        #     if noise > 700:
-        #         x, y, width, height = cv2.boundingRect(i)
-        #         cv2.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
         cv2.imshow("Main Frame", frame)
         cv2.imshow("black_pieces", black_pieces)
         # cv2.imshow("white_pieces", white_pieces)

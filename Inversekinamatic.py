@@ -2,8 +2,15 @@ import json
 import math
 with open('measurements.json', 'r') as file:
     data = json.load(file)
+
+with open('inversekinematics.json', 'r') as file:
+    degree_data = json.load(file)
+
 new_data = []
+servo_arms_length = 14.5
+
 for key in data:
+    new_data = []
     square_values = data[key]
     x = square_values[0]
     y = square_values[1]
@@ -12,15 +19,50 @@ for key in data:
     xy_angle_radian = math.atan2(x,y)
     xy_angle_degrees = math.degrees(xy_angle_radian)
     xy_angle_degrees = -1 * xy_angle_degrees
-    new_data.append(90-xy_angle_degrees) # Maingear servo
+    new_data.append(90+xy_angle_degrees) # Hub servo
     if "b" in key:
         print(key + " " + str(90-xy_angle_degrees))
-new_data.sort()
-print(str(new_data[0]) + " " + str(new_data[-1])) # use these to set max and min abnlges of servos
+    xy_dist = math.sqrt(x**2+y**2)
+    max_dist = math.sqrt(xy_dist**2+z**2)
+
+    #Triangle angle finder
+    cos_main = (servo_arms_length**2 + servo_arms_length**2 - max_dist**2) / (2 * servo_arms_length* servo_arms_length)
+    print(cos_main)
+    if cos_main >1 or cos_main<-1:
+        print(max_dist)
+        print(x)
+        print(y)
+        print(z)
+        cos_main = 1
+        new_data.append("CHECK")
+    angle_C = math.acos(cos_main)  # Returns radians
+    forearm_degree_inside = math.degrees(angle_C)
+    smaller_angles = (180 - forearm_degree_inside)/2
+
+    # pythagorean triangle angles
+    xy_z_angle_radian = math.atan2(z,xy_dist)
+    xy_z_angle_degrees_arm = math.degrees(xy_z_angle_radian)
+    xy_z_angle_degrees_grabber = 90 - xy_z_angle_degrees_arm
+
+    #arm movement
+    new_data.append(xy_z_angle_degrees_arm+smaller_angles)
+
+    #forearm movement
+    new_data.append(forearm_degree_inside)
+
+    #grabber movement
+    new_data.append(xy_z_angle_degrees_grabber+smaller_angles)
+
+    degree_data[key] = new_data
+
+
+print(str(new_data[0]) + " " + str(new_data[-1])) # use these to set max and min abnlges of hub servo
+with open('inversekinematics.json', 'w') as file:
+    json.dump(degree_data,file,indent = 4)
 
 
 
-
+# # Dimesnsion changes
 # main_data = []
 # multiplier = 0
 # m_data = ["a","b","c","d","e","f","g","h"]
@@ -30,7 +72,7 @@ print(str(new_data[0]) + " " + str(new_data[-1])) # use these to set max and min
 #     multi_sec = int(key[1])-1
 #     new_data[0] = round(-9.8 + multi_sec*2.8, 2)
 #     new_data[1] = round(11 + multiplier*2.8, 2)
-#     new_data[2] = 3.5
+#     new_data[2] = 10.5
 #     data[key] = new_data
 # print("done")
 
@@ -47,6 +89,7 @@ print(str(new_data[0]) + " " + str(new_data[-1])) # use these to set max and min
 
 # with open('measurements.json', 'w') as file:
 #     file.write("\n".join(output_lines))
+
 
 
 # {
