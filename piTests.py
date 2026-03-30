@@ -2,6 +2,7 @@ from gpiozero import Device, AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from time import sleep
 import json
+import json
 
 Device.pin_factory = PiGPIOFactory()
 
@@ -24,9 +25,10 @@ class Mover(AngularServo):
         else:
             while current_angle > degrees:
                 current_angle = max(current_angle - step_size, degrees)
+                self.angle = current_angle
                 sleep(delay)
 hub = Mover(
-    17,
+    27,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
@@ -34,7 +36,7 @@ hub = Mover(
 )
 
 arm = Mover(
-    27,
+    17,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
@@ -59,8 +61,8 @@ wrist = Mover(
 
 def reset_angles():
     hub.set_angle(180)
-    arm.set_angle(120)
-    forearm.set_angle(180)
+    arm.set_angle(110)
+    forearm.set_angle(130)
     wrist.set_angle(180)
 
 
@@ -72,7 +74,12 @@ try:
     reset_angles()
     sleep(5)
     print("configure and start")
+    print("Resetting servos")
+    reset_angles()
+    sleep(5)
+    print("configure and start")
     while True:
+        user_input = input("Enter position: ")
         user_input = input("Enter position: ")
         
         if user_input.lower() in ['q', 'quit', 'exit']:
@@ -81,11 +88,13 @@ try:
             
         try:
             movement = data[user_input]
-            arm.set_angle(movement[0])
+            arm.set_angle(90)
             # arm.set_angle(movement[1])
             # forearm.set_angle(movement[2])
             # wrist.set_angle(movement[3])
             sleep(0.5)  # Small delay to let servo reach position
+        except KeyError:
+            print("Please enter a valid chess position (a1-h8)")
         except KeyError:
             print("Please enter a valid chess position (a1-h8)")
             
@@ -95,4 +104,6 @@ except KeyboardInterrupt:
 finally:
     # Optional: return servo to neutral/center when done
     reset_angles()
+    reset_angles()
     print("Servo returned to center position")
+
