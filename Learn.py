@@ -16,7 +16,6 @@ distCoeffs = np.array([
     [0.11655149, -0.0385357, 0.00033531, 0.00156088, 0.31343139]
 ])
 
-
 def undistort_frame(frame):
     h,  w = frame.shape[:2]
     newCameraMatrix, roi = cv2.getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, (w,h), 1, (w,h))
@@ -137,7 +136,6 @@ def board_setup(cap):
     cap.release()
     cv2.destroyAllWindows()
 
-
 def board_update(cap):
     while True:
         success, frame = cap.read()
@@ -145,30 +143,31 @@ def board_update(cap):
             break
         
         frame = preprocess_frame(frame)
+        cv2.imshow("Board Preview", frame)
         
+        chess_board = frame.copy()    
+        imgray = cv2.cvtColor(chess_board, cv2.COLOR_BGR2GRAY)
+        ret, black_pieces = cv2.threshold(imgray, 90, 255, cv2.THRESH_BINARY_INV)
+        black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        locations = []
+        for i in black_countours:
+            noise = cv2.contourArea(i)
+            if noise > 700:
+                x, y, width, height = cv2.boundingRect(i)
+                cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
+                cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
+                locations.append((int(x+(width/2)), int(y+(height/2))))
+        cv2.imshow("Main Frame", chess_board)
+        cv2.imshow("black_pieces", black_pieces)
+        cv2.imshow("gray", imgray)
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            chess_board = frame.copy()    
-            imgray = cv2.cvtColor(chess_board, cv2.COLOR_BGR2GRAY)
-            ret, black_pieces = cv2.threshold(imgray, 40, 255, cv2.THRESH_BINARY_INV)
-            black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            locations = []
-            for i in black_countours:
-                noise = cv2.contourArea(i)
-                if noise > 700:
-                    x, y, width, height = cv2.boundingRect(i)
-                    cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
-                    cv2.circle(chess_board, int(x+(width/2)), int(y+(height/2)), (0, 0, 255), 2)
-                    locations.append((int(x+(width/2)), int(y+(height/2))))
-            cv2.imshow("Main Frame", chess_board)
-            cv2.imshow("black_pieces", black_pieces)
-            cv2.imshow("gray", imgray)
-            cv2.waitKey(2000)
+            cv2.waitKey(1000)
             cap.release()
             cv2.destroyAllWindows()
             return locations
 
-# x = board_setup(cap)
-
+x = board_update(cap)
+print(x)
 
 
 
