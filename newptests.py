@@ -37,26 +37,33 @@ hub = Mover(
 
 
 def reset_angles():
-    hub.set_angle(180)
+    hub.set_angle(0)
+
+def end_angle():
+    hub.set_angle(0)
+    # hub.set_angle(0)
+    # hub.set_angle(0)
+    # hub.set_angle(0)
+
 
 
 # Main program loop
 print("RUN 'q' or Ctrl+C to quit")
 print("Resetting servos")
 reset_angles()
-sleep(5)
-print("configure and start")
-print("Resetting servos")
-reset_angles()
-sleep(5)
+sleep(2)
 print("configure and start")
 while True:
-    user_input = int(input("Enter position: "))
-    if 0 <= user_input <= 180:
-        movement = data[user_input]
-        hub.set_angle(90)
-        sleep(0.5)
-    else:
-        print("pass")
-        sleep(0.5)
+    try:
+        user_input = int(input("Enter position: "))
         
+        if 0 <= user_input <= 180:
+            hub.set_angle(user_input)
+            sleep(0.5)
+        else:
+            print("pass")
+            sleep(0.5)
+    except KeyboardInterrupt:
+        print("EXIT")
+        end_angle()
+        break
