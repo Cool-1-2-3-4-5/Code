@@ -6,6 +6,19 @@ import json
 
 Device.pin_factory = PiGPIOFactory()
 
+# Typical 180-degree servo calibration.
+SERVO_MIN_PULSE_WIDTH = 0.7 / 1000  # 1.0 ms
+SERVO_MAX_PULSE_WIDTH = 2 / 1000  # 2.0 ms
+
+# min_pulse_width=0.5/1000,
+#     max_pulse_width=2.4/1000
+
+# SERVO_MIN_PULSE_WIDTH = 0.5 / 1000  # 1.0 ms
+# SERVO_MAX_PULSE_WIDTH = 2.38 / 1000  # 2.0 ms
+
+# SERVO_MIN_PULSE_WIDTH = 0.5 / 1000  # 1.0 ms
+# SERVO_MAX_PULSE_WIDTH = 2.4 / 1000  # 2.0 ms
+
 # Read measurements.json and output to data array
 with open('inversekinematics.json', 'r') as f:
     data = json.load(f)
@@ -31,19 +44,46 @@ hub = Mover(
     27,
     min_angle=0,
     max_angle=180,
-    min_pulse_width=0.5 / 1000,    # 0.5 ms
-    max_pulse_width=2.5 / 1000     # 2.5 ms
+    min_pulse_width= 0.7 / 1000,
+    max_pulse_width= 2 / 1000
+)
+
+arm = Mover(
+    17,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
+)
+
+forearm = Mover(
+    22,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.38 / 1000
+)
+
+wrist = Mover(
+    23,
+    min_angle=0,
+    max_angle=180,
+    in_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
 )
 
 
 def reset_angles():
     hub.set_angle(0)
+    arm.set_angle(0)
+    forearm.set_angle(45)
+    wrist.set_angle(0)
 
 def end_angle():
     hub.set_angle(0)
-    # hub.set_angle(0)
-    # hub.set_angle(0)
-    # hub.set_angle(0)
+    arm.set_angle(0)
+    forearm.set_angle(0)
+    wrist.set_angle(0)
 
 
 
