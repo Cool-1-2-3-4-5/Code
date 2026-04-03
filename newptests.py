@@ -118,21 +118,3 @@ while True:
         print("EXIT")
         end_angle()
         break
-
-
-    user_input = input("Enter position: ")
-    if user_input == "q":
-
-    try:
-        user_input = int(input("Enter position: "))
-        
-        if 0 <= user_input <= 180:
-            hub.set_angle(user_input)
-            sleep(0.5)
-        else:
-            print("pass")
-            sleep(0.5)
-    except KeyboardInterrupt:
-        print("EXIT")
-        end_angle()
-        break
