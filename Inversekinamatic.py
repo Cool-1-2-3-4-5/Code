@@ -45,7 +45,7 @@ for key in data:
     xy_z_angle_degrees_grabber = 90 - xy_z_angle_degrees_arm
 
     #arm movement
-    new_data.append(135 - (xy_z_angle_degrees_arm+smaller_angles))
+    new_data.append(180 - (xy_z_angle_degrees_arm+smaller_angles))
 
     #forearm movement
     new_data.append(forearm_degree_inside)

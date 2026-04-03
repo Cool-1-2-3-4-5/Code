@@ -68,7 +68,7 @@ wrist = Mover(
     23,
     min_angle=0,
     max_angle=180,
-    in_pulse_width= 0.5 / 1000,
+    min_pulse_width= 0.5 / 1000,
     max_pulse_width= 2.4 / 1000
 )
 
@@ -93,23 +93,21 @@ print("Resetting servos")
 reset_angles()
 sleep(2)
 print("configure and start")
+name = None
 while True:
     try:
         user_input = input("Enter position: ")
-
-        if user_input == "h" or user_input == "f" or user_input == "a" or user_input == "g":
-            if user_input == "h":
-                name = hub
-            if user_input == "f":
-                name = arm
-            if user_input == "a":
-                name = forearm
-            else:
-                name = wrist
-                
+        if user_input == "h":
+            name = hub
+        elif user_input == "f":
+            name = forearm
+        elif user_input == "a":
+            name = arm
+        elif user_input == "g":
+            name = wrist
         else:
-            if 0 <= user_input <= 180:
-                name.set_angle(user_input)
+            if 0 <= int(user_input) <= 180:
+                name.set_angle(int(user_input))
                 sleep(0.5)
             else:
                 print("pass")
@@ -118,3 +116,15 @@ while True:
         print("EXIT")
         end_angle()
         break
+# a1:
+# 139
+# 93
+# 132
+# 75
+
+# b1:
+# 135
+# 93
+# 122
+# 87
+# Recaluclate forearm: conssitently 60 degrees under target
