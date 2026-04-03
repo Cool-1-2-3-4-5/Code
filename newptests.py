@@ -95,6 +95,35 @@ sleep(2)
 print("configure and start")
 while True:
     try:
+        user_input = input("Enter position: ")
+
+        if user_input == "h" or user_input == "f" or user_input == "a" or user_input == "g":
+            if user_input == "h":
+                name = hub
+            if user_input == "f":
+                name = arm
+            if user_input == "a":
+                name = forearm
+            else:
+                name = wrist
+                
+        else:
+            if 0 <= user_input <= 180:
+                name.set_angle(user_input)
+                sleep(0.5)
+            else:
+                print("pass")
+                sleep(0.5)
+    except KeyboardInterrupt:
+        print("EXIT")
+        end_angle()
+        break
+
+
+    user_input = input("Enter position: ")
+    if user_input == "q":
+
+    try:
         user_input = int(input("Enter position: "))
         
         if 0 <= user_input <= 180:
