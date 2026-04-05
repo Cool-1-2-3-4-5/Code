@@ -26,7 +26,7 @@ class ChessboardUI:
 
 
         # Board parameters
-        self.square_size = 60
+        self.square_size = 105
         self.board_size = 8
         
         # Create canvas
@@ -83,16 +83,18 @@ class ChessboardUI:
                     font=('Arial', 32, 'bold'),
                     tags = "pieces"
                 )
-    def write(self,user_text,tag,length):
-        canvas_size = self.square_size * self.board_size
-        x = canvas_size // 2
-        y = canvas_size // 2       
-        self.canvas.create_text(
-            x, y,
-            text=user_text,
-            font=('Arial', 32, 'bold'),
-            tags = tag
-        )
+    def write(self,user_text,tag,length,font_size):
+        text_array = user_text.split("\n")
+        for i in range(len(text_array)):
+            canvas_size = self.square_size * self.board_size
+            x = canvas_size // 2
+            y = canvas_size // 2 + ((font_size+2)*(i+1))       
+            self.canvas.create_text(
+                x, y,
+                text=text_array[i],
+                font=('Arial', font_size, 'bold'),
+                tags = tag
+            )
         self.root.update()
         self.delay(length)
         self.clear_text(tag)
@@ -108,9 +110,9 @@ if __name__ == "__main__":
     bot = chess.Board()
     gui = ChessboardUI(root, bot)
     
-    gui.write("Welcome to the Robot vs Human Chess Game, White to go first, once turn is done press 'space bar' to ensure you final move is confirmed","start",3)
-    gui.write("LETS START THE GAME IN 5 SECONDS","second_start",5)
-    gui.write("LETS BEGIN:","third_start",2)
+    gui.write("Welcome to the Robot vs Human Chess Board Game! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",3,20)
+    gui.write("LETS START THE GAME\nIN 5 SECONDS","second_start",5,40)
+    gui.write("LETS BEGIN!","third_start",2,50)
     gui.setboard(bot)
     gui.root.update()
     gui.delay(2)
