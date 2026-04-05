@@ -138,7 +138,7 @@ while not bot.is_checkmate():
 
     # Robot calculated move
     if not bot.is_checkmate():
-        bestMove_in_UCI, bestMove_in_SAN = ChessLibrary.minimax(bot,3,True,-100000,100000,True)
+        bestMove_in_UCI, bestMove_in_SAN = ChessLibrary.minimax(bot, bot.legal_moves,3,True,-100000,100000,True)
         ChessLibrary.reset()
 
         # Find if best move captures or just moves piece

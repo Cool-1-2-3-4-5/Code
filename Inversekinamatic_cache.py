@@ -18,7 +18,8 @@ for key in data:
     # xy-plane angle
     xy_angle_radian = math.atan2(y,x)
     xy_angle_degrees = math.degrees(xy_angle_radian)
-    new_data.append(xy_angle_degrees) # Hub servo
+    xy_angle_degrees = -1 * xy_angle_degrees
+    new_data.append(90+xy_angle_degrees) # Hub servo
     if "b" in key:
         print(key + " " + str(90-xy_angle_degrees))
     xy_dist = math.sqrt(x**2+y**2)
@@ -38,14 +39,19 @@ for key in data:
     forearm_degree_inside = math.degrees(angle_C)
     smaller_angles = (180 - forearm_degree_inside)/2
 
+    # pythagorean triangle angles
+    xy_z_angle_radian = math.atan2(z,xy_dist)
+    xy_z_angle_degrees_arm = math.degrees(xy_z_angle_radian)
+    xy_z_angle_degrees_grabber = 90 - xy_z_angle_degrees_arm
+
     #arm movement
-    new_data.append(135 - smaller_angles)
+    new_data.append(135 - (xy_z_angle_degrees_arm+smaller_angles))
 
     #forearm movement
-    new_data.append(180-forearm_degree_inside)
+    new_data.append(forearm_degree_inside)
 
     #grabber movement
-    new_data.append(smaller_angles)
+    new_data.append(xy_z_angle_degrees_grabber+smaller_angles)
 
     degree_data[key] = new_data
 
