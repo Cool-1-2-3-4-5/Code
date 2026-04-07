@@ -6,6 +6,8 @@ import random
 class ChessboardUI:
     def __init__(self, root, chess_logic):
         self.root = root
+        self.chess_logic = chess_logic
+        self.state = False
         self.symbols = {
             # White pieces (uppercase)
             "K": "♔",  # King
@@ -40,10 +42,10 @@ class ChessboardUI:
         )
         self.canvas.pack(padx=10, pady=10)
        
-    def setboard(self,chess_logic):    
+    def setboard(self):    
         # Draw the board
         self.draw_board()
-        self.update_board(chess_logic)
+        self.update_board()
         
     def draw_board(self):
         for row in range(self.board_size):
@@ -66,12 +68,12 @@ class ChessboardUI:
     def clear_text(self,tag):
         self.canvas.delete(tag)
     
-    def update_board(self,chess_logic):
+    def update_board(self):
         self.root.update()
         self.clear_text("pieces")
         for col in range(8):
             for row in range(8):
-                piece = chess_logic.piece_at(chess.square(col, row))
+                piece = self.chess_logic.piece_at(chess.square(col, row))
                 if piece == None:
                     continue
                 x = col * self.square_size + self.square_size // 2
@@ -103,10 +105,9 @@ class ChessboardUI:
         initial = time.time()
         while time.time() < initial + length:
             pass
-    def wait_for_space(self):
-        self.root.focus()
-        print("key entered")
-        
+    def pressed(self,event):
+        print("pressed")
+        self.state = True
         
 if __name__ == "__main__":
     root = tk.Tk()
@@ -116,18 +117,32 @@ if __name__ == "__main__":
     gui.write("Welcome to the Robot vs Human Chess Board Game! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",3,20)
     gui.write("LETS START THE GAME\nIN 5 SECONDS","second_start",5,40)
     gui.write("LETS BEGIN!","third_start",2,50)
-    gui.setboard(bot)
+    gui.setboard()
     gui.root.update()
     gui.delay(2)
     # Game loop
-
     # Robot goes first (Robot is White)
-    legal_moves = list(bot.legal_moves)
-    random_index = random.randint(0, len(legal_moves) - 1)
-    random_move = legal_moves[random_index]
-    bot.push(random_move)
-    gui.update_board(bot)
-    gui.root.bind('<space>',user_entered)
-    root.mainloop()
-
-
+    print("here")
+    while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate() :
+        print("Hi")
+        gui.root.bind('<space>',gui.pressed)
+        gui.state = False
+        while not gui.state:
+            gui.root.update()
+        legal_moves = list(gui.chess_logic.legal_moves)
+        random_index = random.randint(0, len(legal_moves) - 1)
+        random_move = legal_moves[random_index]
+        gui.chess_logic.push(random_move)
+        gui.update_board()
+        gui.root.bind('<space>',gui.pressed)
+        if not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
+            gui.state = False
+            while not gui.state:
+                gui.root.update()
+            legal_moves = list(gui.chess_logic.legal_moves)
+            random_index = random.randint(0, len(legal_moves) - 1)
+            random_move = legal_moves[random_index]
+            gui.chess_logic.push(random_move)
+            gui.update_board()
+            print("Done")
+    gui.root.mainloop()
