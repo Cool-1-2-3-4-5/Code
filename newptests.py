@@ -6,6 +6,7 @@ import json
 
 Device.pin_factory = PiGPIOFactory()
 
+
 # Typical 180-degree servo calibration.
 SERVO_MIN_PULSE_WIDTH = 0.7 / 1000  # 1.0 ms
 SERVO_MAX_PULSE_WIDTH = 2 / 1000  # 2.0 ms
@@ -41,7 +42,7 @@ class Mover(AngularServo):
                 self.angle = current_angle
                 sleep(delay)
 hub = Mover(
-    27,
+    17,
     min_angle=0,
     max_angle=180,
     min_pulse_width= 0.7 / 1000,
@@ -49,7 +50,7 @@ hub = Mover(
 )
 
 arm = Mover(
-    17,
+    27,
     min_angle=0,
     max_angle=180,
     min_pulse_width= 0.5 / 1000,
@@ -71,19 +72,28 @@ wrist = Mover(
     min_pulse_width= 0.5 / 1000,
     max_pulse_width= 2.4 / 1000
 )
+gripper = Mover(
+    24,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
+)
 
 
 def reset_angles():
     hub.set_angle(0)
     arm.set_angle(0)
     forearm.set_angle(45)
-    wrist.set_angle(0)
+    wrist.set_angle(180)
+    gripper.set_angle(0)
 
 def end_angle():
     hub.set_angle(0)
     arm.set_angle(0)
     forearm.set_angle(0)
     wrist.set_angle(0)
+    gripper.set_angle(0)
 
 
 
@@ -94,20 +104,30 @@ reset_angles()
 sleep(2)
 print("configure and start")
 name = None
+main_array=[[],[],[],[],[]]
+array = ["h","a","f","w","g"]
 while True:
     try:
         user_input = input("Enter position: ")
         if user_input == "h":
             name = hub
+            appender = "h"
         elif user_input == "f":
             name = forearm
+            appender = "f"
         elif user_input == "a":
             name = arm
-        elif user_input == "g":
+            appender = "a"
+        elif user_input == "w":
             name = wrist
+            appender = "w"
+        elif user_input == "g":
+            name = gripper
+            appender = "g"
         else:
             if 0 <= int(user_input) <= 180:
                 name.set_angle(int(user_input))
+                main_array[array.index(appender)].append(int(user_input))
                 sleep(0.5)
             else:
                 print("pass")
@@ -115,6 +135,12 @@ while True:
     except KeyboardInterrupt:
         print("EXIT")
         end_angle()
+        print(main_array)
+        print("Hub: " + str(main_array[0][-1]))
+        print("Arm: " + str(main_array[1][-1]))
+        print("Forearm: " + str(main_array[2][-1]))
+        print("Wrist: " + str(main_array[3][-1]))
+        print("Gripper: " + str(main_array[4][-1]))
         break
 # a1:
 # 139
