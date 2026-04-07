@@ -103,6 +103,9 @@ class ChessboardUI:
         initial = time.time()
         while time.time() < initial + length:
             pass
+    def wait_for_space(self):
+        self.root.focus()
+        print("key entered")
         
         
 if __name__ == "__main__":
@@ -124,6 +127,7 @@ if __name__ == "__main__":
     random_move = legal_moves[random_index]
     bot.push(random_move)
     gui.update_board(bot)
+    gui.root.bind('<space>',user_entered)
     root.mainloop()
 
 
