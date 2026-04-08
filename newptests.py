@@ -1,6 +1,7 @@
 from gpiozero import Device, AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from time import sleep
+from concurrent.futures import ThreadPoolExecutor
 import json
 import json
 
@@ -96,6 +97,16 @@ def end_angle():
     gripper.set_angle(0)
 
 
+def move_arm_with_wrist(angle):
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(arm.set_angle, arm.angle + angle)
+        executor.submit(wrist.set_angle, wrist.angle + angle)
+
+def move_accross(angle):
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(arm.set_angle, arm.angle + angle)
+        executor.submit(forearm.set_angle, forearm.angle - angle)
+
 
 # Main program loop
 print("RUN 'q' or Ctrl+C to quit")
@@ -109,29 +120,36 @@ array = ["h","a","f","w","g"]
 while True:
     try:
         user_input = input("Enter position: ")
-        if user_input == "h":
-            name = hub
-            appender = "h"
-        elif user_input == "f":
-            name = forearm
-            appender = "f"
-        elif user_input == "a":
-            name = arm
-            appender = "a"
-        elif user_input == "w":
-            name = wrist
-            appender = "w"
-        elif user_input == "g":
-            name = gripper
-            appender = "g"
+        if user_input == "f1":
+            degrees = int(input("Enter Degrees for threading"))
+            move_accross(degrees)
+        elif user_input == "f2":
+            degrees = int(input("Enter De"))
+            move_arm_with_wrist(degrees)
         else:
-            if 0 <= int(user_input) <= 180:
-                name.set_angle(int(user_input))
-                main_array[array.index(appender)].append(int(user_input))
-                sleep(0.5)
+            if user_input == "h":
+                name = hub
+                appender = "h"
+            elif user_input == "f":
+                name = forearm
+                appender = "f"
+            elif user_input == "a":
+                name = arm
+                appender = "a"
+            elif user_input == "w":
+                name = wrist
+                appender = "w"
+            elif user_input == "g":
+                name = gripper
+                appender = "g"
             else:
-                print("pass")
-                sleep(0.5)
+                if 0 <= int(user_input) <= 180:
+                    name.set_angle(int(user_input))
+                    main_array[array.index(appender)].append(int(user_input))
+                    sleep(0.5)
+                else:
+                    print("pass")
+                    sleep(0.5)
     except KeyboardInterrupt:
         print("EXIT")
         end_angle()
