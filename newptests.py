@@ -101,13 +101,85 @@ def move_arm_with_wrist(angle):
         executor.submit(arm.set_angle, arm.angle + angle)
         executor.submit(wrist.set_angle, wrist.angle + angle)
 
-def move_accross(arm_angle, forearm_angle):
+def move_across(arm_angle, forearm_angle):
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(arm.set_angle, arm_angle)
         executor.submit(forearm.set_angle, forearm_angle)
 
 def update_board(move,interval=0.5):
     first_half = move[0] + move[1]
+    positions = data[first_half]
+
+    # first set
+    hub.set_angle(positions[0])
+    sleep(interval)
+    arm.set_angle(positions[1])
+    sleep(interval)
+    forearm.set_angle(positions[2])
+    sleep(interval)
+    wrist.set_angle(positions[3])
+    sleep(interval+1)
+    gripper.set_angle(47)
+    sleep(interval+3)
+    
+    
+    #Go down
+    move_arm_with_wrist(positions[4])
+    sleep(interval)
+    
+    gripper.set_angle(59)
+    sleep(interval)
+
+    #Go Up
+    move_arm_with_wrist(-1 * positions[4])
+    sleep(interval)
+
+    arm.set_angle(positions[1]-20)
+    sleep(interval)
+
+    second_half = move[2] + move[3]
+
+    positions2 = data[second_half]
+    
+    # Go to next square:
+
+    move_across(positions2[1],positions2[2])
+    sleep(interval)
+
+    # second set
+    hub.set_angle(positions2[0])
+    sleep(interval)
+    wrist.set_angle(positions2[3])
+    sleep(interval)
+
+    #Go down
+    move_arm_with_wrist(positions2[4])
+    sleep(interval)
+    
+    gripper.set_angle(41)
+    sleep(interval)
+
+    #Going up
+    move_arm_with_wrist(-1 * (positions2[4]+10))
+    sleep(interval)
+
+def drop_piece(interval=0.5):
+    arm.set_angle(arm.angle-20)
+    sleep(interval)
+    forearm.set_angle(90)
+    sleep(interval)
+    hub.set_angle(0)
+    sleep(interval)
+    arm.set_angle(60)
+    sleep(interval)
+    wrist.set_angle(40)
+    sleep(interval)
+    gripper.set_angle(0)
+    sleep(interval)
+
+
+def capture_move(move,interval=0.5):
+    first_half = move[-2] + move[-1]
     positions = data[first_half]
 
     # first set
@@ -137,18 +209,21 @@ def update_board(move,interval=0.5):
     arm.set_angle(positions[1]-20)
     sleep(interval)
 
-    second_half = move[2] + move[3]
+    drop_piece()
+
+    second_half = move[0] + move[1]
 
     positions2 = data[second_half]
     
     # Go to next square:
+    
+    hub.set_angle(positions2[0])
+    sleep(interval)
 
-    move_accross(positions2[1],positions2[2])
+    move_across(positions2[1],positions2[2])
     sleep(interval)
 
     # second set
-    hub.set_angle(positions2[0])
-    sleep(interval)
     wrist.set_angle(positions2[3])
     sleep(interval)
 
@@ -162,7 +237,37 @@ def update_board(move,interval=0.5):
     #Going up
     move_arm_with_wrist(-1 * positions2[4])
     sleep(interval)
+
+    arm.set_angle(positions[1]-20)
+    sleep(interval)
+
+    # Place piece
+    hub.set_angle(positions[0])
+    sleep(interval)
+    arm.set_angle(positions[1])
+    sleep(interval)
+    forearm.set_angle(positions[2])
+    sleep(interval)
+    wrist.set_angle(positions[3])
+    sleep(interval+1)
+    gripper.set_angle(47)
+    sleep(interval+3)
     
+    
+    #Go down
+    move_arm_with_wrist(positions[4])
+    sleep(interval)
+    
+    gripper.set_angle(56)
+    sleep(interval)
+
+    #Go Up
+    move_arm_with_wrist(-1 * positions[4])
+    sleep(interval)
+
+    arm.set_angle(positions[1]-20)
+    sleep(interval)
+
 
 # Main program loop
 print("RUN 'q' or Ctrl+C to quit")
@@ -179,9 +284,12 @@ while True:
         if user_input == "move":
             move_to_play = input("ENTER MOVE: ")
             update_board(move_to_play)
+        elif user_input == "move2":
+            move_to_play = input("Capture MOVE: ")
+            capture_move(move_to_play)
         elif user_input == "f1":
             degrees = int(input("Enter Degrees for threading"))
-            move_accross(degrees)
+            move_across(degrees)
         elif user_input == "f2":
             degrees = int(input("Enter De"))
             move_arm_with_wrist(degrees)
