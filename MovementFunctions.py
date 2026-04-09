@@ -1,68 +1,249 @@
 from gpiozero import AngularServo
 from time import sleep
+from concurrent.futures import ThreadPoolExecutor
+import json
 
-def smooth_set_angle(servo, target_angle, step_size=1, delay=0.05):
-    if not (0 <= target_angle <= 180):
-        return
+with open('inversekinematics.json', 'r') as f:
+    data = json.load(f)
+
+hub = None
+arm = None
+forearm = None
+wrist = None
+gripper = None
+
+class Mover(AngularServo):
+    def set_angle(self,degrees,step_size=0.3, delay=0.01):
+        if self.angle is not None:
+            current_angle = self.angle
+        else:
+            current_angle = 90
+
+        if current_angle < degrees:
+            while current_angle < degrees:
+                current_angle = min(current_angle + step_size, degrees)
+                self.angle = current_angle
+                sleep(delay)
+        else:
+            while current_angle > degrees:
+                current_angle = max(current_angle - step_size, degrees)
+                self.angle = current_angle
+                sleep(delay)
+
+def servo_loader(main_hub,main_arm,main_forearm,main_wrist,main_gripper):
+    global hub
+    hub = Mover(main_hub)
+    global arm
+    arm = Mover(main_arm)
+    global forearm
+    forearm = Mover(main_forearm)
+    global wrist
+    wrist = Mover(main_wrist)
+    global gripper
+    gripper = Mover(main_gripper)
+
+def reset_angles():
+    hub.set_angle(0)
+    arm.set_angle(0)
+    forearm.set_angle(45)
+    wrist.set_angle(180)
+    gripper.set_angle(0)
+
+def end_angle():
+    hub.set_angle(0)
+    arm.set_angle(0)
+    forearm.set_angle(0)
+    wrist.set_angle(0)
+    gripper.set_angle(0)
+
+
+def move_arm_with_wrist(angle):
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(arm.set_angle, arm.angle + angle)
+        executor.submit(wrist.set_angle, wrist.angle + angle)
+
+def move_across(arm_angle, forearm_angle):
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(arm.set_angle, arm_angle)
+        executor.submit(forearm.set_angle, forearm_angle)
+
+def regular_move(move,interval=0.5):
+    first_half = move[0] + move[1]
+    positions = data[first_half]
+
+    # first set
+    hub.set_angle(positions[0])
+    sleep(interval)
+    arm.set_angle(positions[1])
+    sleep(interval)
+    forearm.set_angle(positions[2])
+    sleep(interval)
+    wrist.set_angle(positions[3])
+    sleep(interval+1)
+    gripper.set_angle(47)
+    sleep(interval+3)
     
-    if servo.angle is not None:
-        current_angle = servo.angle
+    
+    #Go down
+    move_arm_with_wrist(positions[4])
+    sleep(interval)
+    
+    gripper.set_angle(56)
+    sleep(interval)
+
+    #Go Up
+    move_arm_with_wrist(-1 * positions[4])
+    sleep(interval)
+
+    arm.set_angle(positions[1]-20)
+    sleep(interval)
+
+    second_half = move[2] + move[3]
+
+    positions2 = data[second_half]
+    
+    # Go to next square:
+
+    
+    hub.set_angle(positions2[0])
+    sleep(interval)
+
+    move_across(positions2[1],positions2[2])
+    sleep(interval)
+
+    # second set
+    wrist.set_angle(positions2[3])
+    sleep(interval)
+
+    #Go down
+    move_arm_with_wrist(positions2[4])
+    sleep(interval)
+    
+    gripper.set_angle(41)
+    sleep(interval)
+
+    #Going up
+    move_arm_with_wrist(-1 * positions2[4])
+    sleep(interval)
+
+
+
+def capture_move(move,interval=0.5):
+    first_half = move[-2] + move[-1]
+    positions = data[first_half]
+
+    # first set
+    hub.set_angle(positions[0])
+    sleep(interval)
+    arm.set_angle(positions[1])
+    sleep(interval)
+    forearm.set_angle(positions[2])
+    sleep(interval)
+    wrist.set_angle(positions[3])
+    sleep(interval+1)
+    gripper.set_angle(47)
+    sleep(interval+3)
+    
+    
+    #Go down
+    move_arm_with_wrist(positions[4])
+    sleep(interval)
+    
+    gripper.set_angle(56)
+    sleep(interval)
+
+    #Go Up
+    move_arm_with_wrist(-1 * positions[4])
+    sleep(interval)
+
+    arm.set_angle(positions[1]-20)
+    sleep(interval)
+
+    drop_piece()
+
+    second_half = move[0] + move[1]
+
+    positions2 = data[second_half]
+    
+    # Go to next square:
+    
+    hub.set_angle(positions2[0])
+    sleep(interval)
+
+    move_across(positions2[1],positions2[2])
+    sleep(interval)
+
+    # second set
+    wrist.set_angle(positions2[3])
+    sleep(interval)
+
+    #Go down
+    move_arm_with_wrist(positions2[4])
+    sleep(interval)
+    
+    gripper.set_angle(41)
+    sleep(interval)
+
+    #Going up
+    move_arm_with_wrist(-1 * positions2[4])
+    sleep(interval)
+
+    arm.set_angle(positions[1]-20)
+    sleep(interval)
+
+    # Place piece
+    hub.set_angle(positions[0])
+    sleep(interval)
+    arm.set_angle(positions[1])
+    sleep(interval)
+    forearm.set_angle(positions[2])
+    sleep(interval)
+    wrist.set_angle(positions[3])
+    sleep(interval+1)
+    gripper.set_angle(47)
+    sleep(interval+3)
+    
+    
+    #Go down
+    move_arm_with_wrist(positions[4])
+    sleep(interval)
+    
+    gripper.set_angle(56)
+    sleep(interval)
+
+    #Go Up
+    move_arm_with_wrist(-1 * positions[4])
+    sleep(interval)
+
+    arm.set_angle(positions[1]-20)
+    sleep(interval)
+
+def drop_piece(interval=0.5):
+    arm.set_angle(90)
+    sleep(interval)
+    forearm.set_angle(0)
+    sleep(interval)
+    wrist.set_angle(80)
+    sleep(interval)
+    hub.set_angle(180)
+    sleep(interval)
+    gripper.set_angle(0)
+    sleep(interval)
+
+def resting(interval=0.5):
+    arm.set_angle(90)
+    sleep(interval)
+    forearm.set_angle(0)
+    sleep(interval)
+    wrist.set_angle(80)
+    sleep(interval)
+    hub.set_angle(0)
+    sleep(interval)
+    gripper.set_angle(0)
+    sleep(interval)
+
+def robotTurnToPlay(move_type, move, interval=0.5):
+    if move_type == "Piece_Won":
+        capture_move(move,interval)
     else:
-        current_angle = 90
-    
-    if current_angle < target_angle:
-        while current_angle < target_angle:
-            current_angle = min(current_angle + step_size, target_angle)
-            servo.angle = current_angle
-            sleep(delay)
-    else:
-        while current_angle > target_angle:
-            current_angle = max(current_angle - step_size, target_angle)
-            servo.angle = current_angle
-            sleep(delay)
-
-def grab_piece(servo, max_angle=30):
-    smooth_set_angle(servo, max_angle)
-
-def reset_grabber(servo, reset_angle=0):
-    smooth_set_angle(servo, reset_angle)
-
-def come_back_to_nor(arm, forearm, wrist, arm_reset=30, forearm_reset=30, wrist_reset=30):
-    smooth_set_angle(arm, arm_reset)
-    smooth_set_angle(forearm, forearm_reset)
-    smooth_set_angle(wrist, wrist_reset)
-    
-def move_joints(shoulder, arm, forearm, wrist, shoulder_reset, arm_reset, forearm_reset, wrist_reset):
-    smooth_set_angle(shoulder, shoulder_reset)
-    smooth_set_angle(arm, arm_reset)
-    smooth_set_angle(forearm, forearm_reset)
-    smooth_set_angle(wrist, wrist_reset)
-    
-
-
-def robotTurnToPlay(move_type, shoulder, arm, forearm, wrist, gripper, go_to_pos, return_to_pos):
-    if move_type == "Piece Won":
-        move_joints(shoulder,arm,forearm,wrist,return_to_pos[0],return_to_pos[1],return_to_pos[2],return_to_pos[3])
-        grab_piece(gripper)
-        sleep(0.5)
-        come_back_to_nor(arm, forearm, wrist)
-        sleep(0.5)
-        move_joints(shoulder,arm,forearm,wrist,30,30,30,30)
-        sleep(0.5)
-        reset_grabber(gripper)
-        sleep(0.5)
-        move_joints(shoulder,arm,forearm,wrist,go_to_pos[0],go_to_pos[1],go_to_pos[2],go_to_pos[3])
-        grab_piece(gripper)
-        sleep(0.5)
-        come_back_to_nor(arm,forearm,wrist)
-        sleep(0.5)
-        move_joints(shoulder,arm,forearm,wrist,return_to_pos[0],return_to_pos[1],return_to_pos[2],return_to_pos[3])
-        reset_grabber(gripper)
-    else:    
-        move_joints(shoulder,arm,forearm,wrist,go_to_pos[0],go_to_pos[1],go_to_pos[2],go_to_pos[3])
-        grab_piece(gripper)
-        sleep(0.5)
-        come_back_to_nor(arm, forearm, wrist)
-        sleep(0.5)
-        move_joints(shoulder,arm,forearm,wrist,return_to_pos[0],return_to_pos[1],return_to_pos[2],return_to_pos[3])
-        reset_grabber(gripper)
+        regular_move(move,interval)

@@ -175,12 +175,9 @@ def board_setup(cap):
 
         cv2.imshow("Frame", frame)
         cv2.waitKey(20)
-    cap.release()
     cv2.destroyAllWindows()
 
 def board_update(cap,board_info):
-    print("press any key to update board")
-    input()
     success, frame = cap.read()
     if not success:
         return
@@ -208,8 +205,6 @@ def board_update(cap,board_info):
     cv2.imwrite("images_save/black_pieces.jpg", black_pieces)
     cv2.imwrite("images_save/gray.jpg", imgray)
     print("Analysis frames saved to images_save/")
-    
-    cap.release()
     return locations
     
     
