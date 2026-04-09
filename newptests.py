@@ -160,7 +160,7 @@ def update_board(move,interval=0.5):
     gripper.set_angle(41)
     sleep(interval)
 
-    #Go Up
+    #Going up
     move_arm_with_wrist(-1 * positions2[4])
     sleep(interval)
     
