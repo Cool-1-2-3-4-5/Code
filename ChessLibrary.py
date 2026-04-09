@@ -1,10 +1,12 @@
 import chess
 
-bot = chess.Board() # CAN NOT HAVE
 best_Score_List = []
 best_Moves_List = []
-cnt = [0] #dont need
-increment = 0 #dont need
+
+def reset():
+    global best_Score_List, best_Moves_List
+    best_Score_List = []
+    best_Moves_List = []
 
 def minimax(bot, Possible_move,depth,WhiteTurn, alpha,beta,firstcall = True): #Lets say black is chess bot
     if depth == 0 or bot.is_checkmate():

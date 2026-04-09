@@ -3,7 +3,6 @@ from gpiozero.pins.pigpio import PiGPIOFactory
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor
 import json
-import json
 
 Device.pin_factory = PiGPIOFactory()
 

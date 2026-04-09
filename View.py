@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # Game loop
     # Robot goes first (Robot is White)
     print("here")
-    while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate() :
+    while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
         print("Hi")
         gui.root.bind('<space>',gui.pressed)
         gui.state = False
