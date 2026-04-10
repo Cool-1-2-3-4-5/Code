@@ -60,10 +60,9 @@ cap.set(vision.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 # Could call if there was a display for the Pi board_info = Learn.board_setup(cap) #return [width of square, length of square, top left corner pos]
 vision.destroyAllWindows()
-main = Learn.load_board_calibration()
+main = Learn.board_setup(cap)
 
 # Motor movements
-
 MovementFunctions.servo_loader(shoulder,arm,forearm,wrist,gripper)
 MovementFunctions.reset_angles()
 

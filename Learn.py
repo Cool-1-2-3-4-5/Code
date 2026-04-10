@@ -72,21 +72,6 @@ def eval_board(prev_setup_main,current_setup_main):
     string += current_setup[0]
     return string
 
-def save_board_calibration(board_info, filename="board_calibration.json"):
-    data = {
-        "delta_x": float(board_info[0]),
-        "delta_y": float(board_info[1]),
-        "top_left": list(board_info[2])
-    }
-    with open(filename, 'w') as f:
-        json.dump(data, f)
-
-def load_board_calibration(filename="board_calibration.json"):
-    with open(filename, 'r') as f:
-        data = json.load(f)
-    board_info = [data["delta_x"], data["delta_y"], tuple(data["top_left"])]
-    return board_info
-
 def draw_board_grid_overlay(frame, board_info):
     if not board_info or len(board_info) < 3:
         return frame
@@ -168,8 +153,6 @@ def board_setup(cap):
             
             cv2.imshow("Frame", frame)
             cv2.waitKey(2000)
-            
-            save_board_calibration(board_length)
 
             return board_length
 
@@ -201,8 +184,8 @@ def board_update(cap,board_info):
     draw_board_grid_overlay(chess_board, board_info)
     
     # Save or display results
-    cv2.imwrite("images_save/Main_Frame.jpg", chess_board)
-    cv2.imwrite("images_save/black_pieces.jpg", black_pieces)
+    cv2.imshow("images_save/Main_Frame.jpg", chess_board)
+    cv2.imshow("images_save/black_pieces.jpg", black_pieces)
     cv2.imwrite("images_save/gray.jpg", imgray)
     print("Analysis frames saved to images_save/")
     return locations
