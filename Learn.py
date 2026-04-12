@@ -6,6 +6,10 @@ import time
 import math
 import json
 
+
+# Display dimensions
+size = 480
+
 # Calibration Data
 cameraMatrix = np.array([
     [727.84220328, 0., 354.16226615],
@@ -35,23 +39,21 @@ def preprocess_frame(frame):
     return frame
 
 click_point = None
-
+corners = []
 def mouse_callback(event, x, y, flags, param):
     global click_point
     if event == cv2.EVENT_LBUTTONDOWN:
         click_point = (x, y)
         print(f"Clicked at: {click_point}")
+        corners.append(click_point)
 
 # which square piece is in
-def piece_in_square(middle_of_piece,board_info):
+def piece_in_square(middle_of_piece):
     letters_array = ['a','b','c','d','e','f','g','h']
     x_pos = middle_of_piece[0]
     y_pos = middle_of_piece[1]
-    top_corner_of_board = board_info[2]
-    relative_x_pos = x_pos - top_corner_of_board[0]
-    relative_y_pos = y_pos - top_corner_of_board[1]
-    raw_x = relative_x_pos/board_info[0]
-    raw_y = relative_y_pos/board_info[1]
+    raw_x = x_pos/(size/8)
+    raw_y = y_pos/(size/8)
     true_pos_x = math.floor(raw_x)
     true_pos_y = math.floor(raw_y)
     if 0 <= true_pos_x <= 7 and 0 <= true_pos_y <=7:
@@ -72,13 +74,11 @@ def eval_board(prev_setup_main,current_setup_main):
     string += current_setup[0]
     return string
 
-def draw_board_grid_overlay(frame, board_info):
-    if not board_info or len(board_info) < 3:
-        return frame
+def draw_board_grid_overlay(frame):
 
-    delta_x = board_info[0]
-    delta_y = board_info[1]
-    top_left = board_info[2]
+    delta_x = size/8
+    delta_y = size/8
+    top_left = [0,0]
 
     x_start = int(top_left[0])
     y_start = int(top_left[1])
@@ -117,21 +117,18 @@ def board_setup(cap):
             pts = list(main_set)
             pts.sort(key=lambda p: p[1])
             top_pts = sorted(pts[:2], key=lambda p: p[0])
-            bot_pts = sorted(pts[2:], key=lambda p: p[0])
-            TL, TR = top_pts[0], top_pts[1]
-            BL, BR = bot_pts[0], bot_pts[1]
+            bot_pts = sorted(pts[2:], key=lambda p: p[0]) 
+            sorted_corners = [top_pts[0], top_pts[1], bot_pts[0], bot_pts[1]]
             
-            delta_x = TR[0]-TL[0]
-            delta_y = BL[1]-TL[1]
-            delta_x = delta_x/8
-            delta_y = delta_y/8
-            x_pos = TL[0]
-            y_pos = TL[1]
-            board_length = [delta_x,delta_y,TL]
-            letters_array = ['a','b','c','d','e','f','g','h']
+            duplicate = frame.copy()            
+            cv2.imshow("Frame", frame)
+            warped_version = perspective_view(duplicate, sorted_corners)
+            x_pos = 0
+            y_pos = 0
+            delta_x = size/8
+            delta_y = size/8
             for i in range(8):
                 for j in range(8):
-                    string = letters_array[j] + str(i+1)
                     x_first = int(x_pos+(j*delta_x))
                     x_second = int(x_pos+((j+1)*delta_x))
                     y_first = int(y_pos+(i*delta_y))
@@ -145,16 +142,15 @@ def board_setup(cap):
                     borders_list.append(TRC)
                     borders_list.append(BLC)
                     borders_list.append(BRC)
-                    cv2.circle(frame, (x_first,y_first), 2, (0, 0, 255), -1)
-                    cv2.circle(frame, (x_second,y_first), 2, (255, 0, 0), -1)
-                    cv2.circle(frame, (x_first,y_second), 2, (0, 255, 0), -1)
-                    cv2.circle(frame, (x_second,y_second), 2, (255,0, 255), -1)
+                    cv2.circle(warped_version, (x_first,y_first), 2, (0, 0, 255), -1)
+                    cv2.circle(warped_version, (x_second,y_first), 2, (255, 0, 0), -1)
+                    cv2.circle(warped_version, (x_first,y_second), 2, (0, 255, 0), -1)
+                    cv2.circle(warped_version, (x_second,y_second), 2, (255,0, 255), -1)
                     # board_dict[string] = borders_list
             
-            cv2.imshow("Frame", frame)
-            cv2.waitKey(2000)
-
-            return board_length
+            cv2.imshow("warped", warped_version)
+            cv2.waitKey(200)
+            return sorted_corners
 
         cv2.imshow("Frame", frame)
         cv2.waitKey(20)
@@ -166,10 +162,11 @@ def board_update(cap,board_info):
         return
     
     frame = preprocess_frame(frame)
+    frame = perspective_view(frame,board_info) 
     analysis_frame = frame.copy()
     chess_board = analysis_frame.copy()
     imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
-    ret, black_pieces = cv2.threshold(imgray, 40, 255, cv2.THRESH_BINARY_INV)
+    ret, black_pieces = cv2.threshold(imgray, 70, 255, cv2.THRESH_BINARY_INV)
     black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     locations = []
     for i in black_countours:
@@ -181,20 +178,31 @@ def board_update(cap,board_info):
             locations.append((int(x+(width/2)), int(y+(height/2))))
 
     # Overlay grid only after analysis, as a user reference.
-    draw_board_grid_overlay(chess_board, board_info)
+    draw_board_grid_overlay(chess_board)
     
     # Save or display results
     cv2.imshow("images_save/Main_Frame.jpg", chess_board)
     cv2.imshow("images_save/black_pieces.jpg", black_pieces)
-    cv2.imwrite("images_save/gray.jpg", imgray)
-    print("Analysis frames saved to images_save/")
+    cv2.imshow("images_save/gray.jpg", imgray)
+    cv2.waitKey(20)
     return locations
-    
-    
+
+def perspective_view(frame, board_info):
+    TL = board_info[0] 
+    TR = board_info[1]
+    BL = board_info[2]
+    BR = board_info[3]
+    src_points = np.float32([TL, TR, BL, BR])
+    final_pnts = np.float32([[0, 0], [size, 0], [0, size], [size, size]])
+    matrix = cv2.getPerspectiveTransform(src_points, final_pnts)
+    warped = cv2.warpPerspective(frame, matrix, (size, size))
+    return warped
+
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     print("Starting chess board detection...")
-    main = board_update(cap)
+    corners = board_setup(cap)
+    main = board_update(cap,corners)
     # try:
     #     # Load pre-calibrated board info from file
     #     main = load_board_calibration()

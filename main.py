@@ -18,21 +18,21 @@ import Learn
 import View
 
 shoulder = AngularServo(
-    23,
+    17,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 arm = AngularServo(
-    23,
+    27,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 forearm = AngularServo(
-    23,
+    22,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
@@ -46,7 +46,7 @@ wrist = AngularServo(
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 gripper = AngularServo(
-    23,
+    24,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
@@ -118,7 +118,7 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
     setup = []
     if locations:
         for mid in locations:
-            location = Learn.piece_in_square(mid,main)
+            location = Learn.piece_in_square(mid)
             if location is not None:
                 if location not in setup:
                     setup.append(location)    
