@@ -119,7 +119,7 @@ def update_board(move,interval=0.5):
     sleep(interval)
     wrist.set_angle(positions[3])
     sleep(interval+1)
-    gripper.set_angle(47)
+    gripper.set_angle(37)
     sleep(interval+3)
     
     
@@ -127,7 +127,7 @@ def update_board(move,interval=0.5):
     move_arm_with_wrist(positions[4])
     sleep(interval)
     
-    gripper.set_angle(59)
+    gripper.set_angle(49)
     sleep(interval)
 
     #Go Up
@@ -191,7 +191,7 @@ def capture_move(move,interval=0.5):
     sleep(interval)
     wrist.set_angle(positions[3])
     sleep(interval+1)
-    gripper.set_angle(47)
+    gripper.set_angle(37)
     sleep(interval+3)
     
     
@@ -199,7 +199,7 @@ def capture_move(move,interval=0.5):
     move_arm_with_wrist(positions[4])
     sleep(interval)
     
-    gripper.set_angle(56)
+    gripper.set_angle(46)
     sleep(interval)
 
     #Go Up
@@ -250,7 +250,7 @@ def capture_move(move,interval=0.5):
     sleep(interval)
     wrist.set_angle(positions[3])
     sleep(interval+1)
-    gripper.set_angle(47)
+    gripper.set_angle(37)
     sleep(interval+3)
     
     
@@ -258,7 +258,7 @@ def capture_move(move,interval=0.5):
     move_arm_with_wrist(positions[4])
     sleep(interval)
     
-    gripper.set_angle(56)
+    gripper.set_angle(46)
     sleep(interval)
 
     #Go Up
