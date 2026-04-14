@@ -156,11 +156,13 @@ def update_board(move,interval=0.5):
     move_arm_with_wrist(positions2[4])
     sleep(interval)
     
-    gripper.set_angle(41)
+    gripper.set_angle(37)
     sleep(interval)
 
     #Going up
     move_arm_with_wrist(-1 * (positions2[4]+10))
+    sleep(interval)
+    wrist.set_angle(90)
     sleep(interval)
 
 def drop_piece(interval=0.5):
