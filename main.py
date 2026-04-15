@@ -130,6 +130,8 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
             gui.chess_logic.push_uci(user_move_in_UCI)
             print("User played: " + user_move_in_UCI)
             gui.update_board()
+            if gui.chess_logic.is_check:
+                gui.write("White in Check\n","Check",2,50,True)
 
             # WHITE Turn
 
@@ -151,6 +153,8 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
                 MovementFunctions.robotTurnToPlay(move_type,bestMove_in_UCI)
                 gui.chess_logic.push_san(bestMove_in_SAN)
                 gui.update_board()
+                if gui.chess_logic.is_check:
+                    gui.write("Black in Check\n","Check",2,50,True)
             else: #Black Won
                 white_won = False
         else: # ADD HERE TO ALLOW FOR USER TO FIX THEIR MOVE

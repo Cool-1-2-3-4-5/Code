@@ -85,10 +85,27 @@ class ChessboardUI:
                     font=('Arial', 32, 'bold'),
                     tags = "pieces"
                 )
-    def write(self,user_text,tag,length,font_size):
+    def write(self,user_text,tag,length,font_size, Background = False):
         text_array = user_text.split("\n")
+        highest = 0
+        canvas_size = self.square_size * self.board_size
+        if Background:
+            for i in range(len(text_array)):
+                if highest < len(text_array[i]):
+                    highest = len(text_array[i])
+            height = (len(text_array) + (len(text_array) -1)) * font_size + 20
+            width =  highest*40
+            x1 = (canvas_size - width) // 2
+            y1 = (canvas_size // 2) - 2
+            x2 = width + ((canvas_size - width) // 2)
+            y2 = canvas_size // 2 + (font_size+2)*(len(text_array)) 
+            self.canvas.create_rectangle(
+                x1, y1, x2, y2,
+                fill= '#CBBDBD',
+                outline= '#CBBDBD',
+                tag = tag
+            )
         for i in range(len(text_array)):
-            canvas_size = self.square_size * self.board_size
             x = canvas_size // 2
             y = canvas_size // 2 + ((font_size+2)*(i+1))       
             self.canvas.create_text(
@@ -134,8 +151,9 @@ if __name__ == "__main__":
         random_move = legal_moves[random_index]
         gui.chess_logic.push(random_move)
         gui.update_board()
-        gui.root.bind('<space>',gui.pressed)
+        gui.write("Black in Check\n","New",2,50,True)
         if not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
+            gui.root.bind('<space>',gui.pressed)
             gui.state = False
             while not gui.state:
                 gui.root.update()
