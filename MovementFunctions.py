@@ -32,15 +32,15 @@ class Mover(AngularServo):
 
 def servo_loader(main_hub,main_arm,main_forearm,main_wrist,main_gripper):
     global hub
-    hub = Mover(main_hub)
+    hub = main_hub
     global arm
-    arm = Mover(main_arm)
+    arm = main_arm
     global forearm
-    forearm = Mover(main_forearm)
+    forearm = main_forearm
     global wrist
-    wrist = Mover(main_wrist)
+    wrist = main_wrist
     global gripper
-    gripper = Mover(main_gripper)
+    gripper = main_gripper
 
 def reset_angles(hub_angle=0):
     hub.set_angle(hub_angle)
