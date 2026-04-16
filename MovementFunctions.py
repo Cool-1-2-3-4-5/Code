@@ -1,7 +1,10 @@
-from gpiozero import AngularServo
+from gpiozero import Device, AngularServo
+from gpiozero.pins.pigpio import PiGPIOFactory
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor
 import json
+
+Device.pin_factory = PiGPIOFactory()
 
 with open('inversekinematics.json', 'r') as f:
     data = json.load(f)

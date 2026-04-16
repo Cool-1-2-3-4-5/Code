@@ -16,42 +16,46 @@ import MovementFunctions
 import ChessLibrary
 import Learn
 import View
-MovementFunctions.Mover
-shoulder = MovementFunctions.Mover(
+
+hub = MovementFunctions.Mover(
     17,
     min_angle=0,
     max_angle=180,
-    min_pulse_width=0.5 / 1000,    # 0.5 ms
-    max_pulse_width=2.5 / 1000     # 2.5 ms
+    min_pulse_width= 0.7 / 1000,
+    max_pulse_width= 2 / 1000
 )
+
 arm = MovementFunctions.Mover(
     27,
     min_angle=0,
     max_angle=180,
-    min_pulse_width=0.5 / 1000,    # 0.5 ms
-    max_pulse_width=2.5 / 1000     # 2.5 ms
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
 )
+
 forearm = MovementFunctions.Mover(
     22,
     min_angle=0,
     max_angle=180,
-    min_pulse_width=0.5 / 1000,    # 0.5 ms
-    max_pulse_width=2.5 / 1000     # 2.5 ms
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.38 / 1000
 )
+
 wrist = MovementFunctions.Mover(
     23,
     min_angle=0,
     max_angle=180,
-    min_pulse_width=0.5 / 1000,    # 0.5 ms
-    max_pulse_width=2.5 / 1000     # 2.5 ms
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
 )
 gripper = MovementFunctions.Mover(
     24,
     min_angle=0,
     max_angle=180,
-    min_pulse_width=0.5 / 1000,    # 0.5 ms
-    max_pulse_width=2.5 / 1000     # 2.5 ms
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
 )
+
 
 # Chess Setup
 prev_piece_locations = [
