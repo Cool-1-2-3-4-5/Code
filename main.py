@@ -53,19 +53,6 @@ gripper = MovementFunctions.Mover(
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
 
-
-# OpenCV Setup
-cap = vision.VideoCapture(0)
-cap.set(vision.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
-# Could call if there was a display for the Pi board_info = Learn.board_setup(cap) #return [width of square, length of square, top left corner pos]
-vision.destroyAllWindows()
-main = Learn.board_setup(cap)
-
-# Motor movements
-MovementFunctions.servo_loader(shoulder,arm,forearm,wrist,gripper)
-MovementFunctions.reset_angles()
-
 # Chess Setup
 prev_piece_locations = [
     'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8',
@@ -78,13 +65,25 @@ white_won = True
 root = tk.Tk()
 gui = View.ChessboardUI(root, bot)
 
+# Motor movements
+MovementFunctions.servo_loader(shoulder,arm,forearm,wrist,gripper)
+MovementFunctions.reset_angles()
+
+# OpenCV Setup
+cap = vision.VideoCapture(0)
+cap.set(vision.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
+vision.destroyAllWindows()
+
+
+gui.write("Welcome to the Robot vs Human Chess Board Game! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",3,20)
+gui.write("First set up the board!\n Enter the four corners of the chess board in any order\n to continue","setup",3,20)
+main = Learn.board_setup(cap)
 
 # GAME LOGIC
 
 # Game Opener
-
-gui.write("Welcome to the Robot vs Human Chess Board Game! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",3,20)
-gui.write("LETS START THE GAME\nIN 5 SECONDS","second_start",5,40)
+gui.write("Great!\nLETS START THE GAME\nIN 5 SECONDS","second_start",5,40)
 gui.write("LETS BEGIN!","third_start",2,50)
 gui.setboard()
 gui.root.update()
