@@ -42,8 +42,8 @@ def servo_loader(main_hub,main_arm,main_forearm,main_wrist,main_gripper):
     global gripper
     gripper = Mover(main_gripper)
 
-def reset_angles():
-    hub.set_angle(0)
+def reset_angles(hub_angle=0):
+    hub.set_angle(hub_angle)
     arm.set_angle(0)
     forearm.set_angle(45)
     wrist.set_angle(180)
@@ -67,28 +67,25 @@ def move_across(arm_angle, forearm_angle):
         executor.submit(arm.set_angle, arm_angle)
         executor.submit(forearm.set_angle, forearm_angle)
 
-def regular_move(move,interval=0.5):
+def regular_move(move,interval=0.8):
     first_half = move[0] + move[1]
     positions = data[first_half]
 
     # first set
     hub.set_angle(positions[0])
     sleep(interval)
-    arm.set_angle(positions[1])
-    sleep(interval)
-    forearm.set_angle(positions[2])
-    sleep(interval)
+    move_across(positions[1],positions[2])
     wrist.set_angle(positions[3])
     sleep(interval+1)
-    gripper.set_angle(47)
-    sleep(interval+3)
+    gripper.set_angle(35)
+    sleep(interval+1)
     
     
     #Go down
     move_arm_with_wrist(positions[4])
     sleep(interval)
     
-    gripper.set_angle(56)
+    gripper.set_angle(49)
     sleep(interval)
 
     #Go Up
@@ -104,14 +101,12 @@ def regular_move(move,interval=0.5):
     
     # Go to next square:
 
-    
-    hub.set_angle(positions2[0])
-    sleep(interval)
-
     move_across(positions2[1],positions2[2])
     sleep(interval)
 
     # second set
+    hub.set_angle(positions2[0])
+    sleep(interval)
     wrist.set_angle(positions2[3])
     sleep(interval)
 
@@ -119,11 +114,16 @@ def regular_move(move,interval=0.5):
     move_arm_with_wrist(positions2[4])
     sleep(interval)
     
-    gripper.set_angle(41)
+    gripper.set_angle(37)
     sleep(interval)
 
     #Going up
-    move_arm_with_wrist(-1 * positions2[4])
+    move_arm_with_wrist(-1 * (positions2[4]+10))
+    sleep(interval)
+    wrist.set_angle(90)
+    sleep(interval)
+    
+    reset_angles(90)
     sleep(interval)
 
 
@@ -135,21 +135,18 @@ def capture_move(move,interval=0.5):
     # first set
     hub.set_angle(positions[0])
     sleep(interval)
-    arm.set_angle(positions[1])
-    sleep(interval)
-    forearm.set_angle(positions[2])
+    move_across(positions[1],positions[2])
     sleep(interval)
     wrist.set_angle(positions[3])
     sleep(interval+1)
-    gripper.set_angle(47)
-    sleep(interval+3)
-    
+    gripper.set_angle(37)
+    sleep(interval+1)
     
     #Go down
     move_arm_with_wrist(positions[4])
     sleep(interval)
     
-    gripper.set_angle(56)
+    gripper.set_angle(46)
     sleep(interval)
 
     #Go Up
@@ -160,7 +157,6 @@ def capture_move(move,interval=0.5):
     sleep(interval)
 
     # Drop Piece
-    sleep(interval+1)
     drop_piece()
 
     # Next Square
@@ -176,29 +172,27 @@ def capture_move(move,interval=0.5):
     sleep(interval)
     wrist.set_angle(positions2[3])
     sleep(interval)
-    gripper.set_angle(47)
+    gripper.set_angle(37)
     sleep(interval)
 
     #Go down
     move_arm_with_wrist(positions2[4])
     sleep(interval)
-    
-    gripper.set_angle(56)
+    print("here")
+    gripper.set_angle(46)
     sleep(interval)
     
     #Going up
     move_arm_with_wrist(-1 * positions2[4])
     sleep(interval)
-
+    print("heraae")
     arm.set_angle(positions2[1]-20)
     sleep(interval)
 
     # Place piece
     hub.set_angle(positions[0])
     sleep(interval)
-    arm.set_angle(positions[1])
-    sleep(interval)
-    forearm.set_angle(positions[2])
+    move_across(positions[1],positions[2])
     sleep(interval)
     wrist.set_angle(positions[3])
     sleep(interval+1)    
@@ -207,24 +201,30 @@ def capture_move(move,interval=0.5):
     move_arm_with_wrist(positions[4])
     sleep(interval)
     
-    gripper.set_angle(47)
+    gripper.set_angle(37)
     sleep(interval)
 
     #Go Up
-    move_arm_with_wrist(-1 * positions[4])
+    move_arm_with_wrist(-1 * (positions[4]+10))
     sleep(interval)
 
     arm.set_angle(positions[1]-20)
     sleep(interval)
+    
+    wrist.set_angle(90)
+    sleep(interval)
+
+    reset_angles(90)
+    sleep(interval)
 
 def drop_piece(interval=0.5):
-    arm.set_angle(90)
+    arm.set_angle(60)
     sleep(interval)
-    forearm.set_angle(0)
+    forearm.set_angle(90)
     sleep(interval)
-    wrist.set_angle(80)
+    hub.set_angle(0)
     sleep(interval)
-    hub.set_angle(180)
+    wrist.set_angle(40)
     sleep(interval)
     gripper.set_angle(0)
     sleep(interval)
