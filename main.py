@@ -63,6 +63,7 @@ vision.destroyAllWindows()
 main = Learn.board_setup(cap)
 
 # Motor movements
+MovementFunctions.servo_loader(shoulder,arm,forearm,wrist,gripper)
 MovementFunctions.reset_angles()
 
 # Chess Setup
