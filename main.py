@@ -17,7 +17,7 @@ import ChessLibrary
 import Learn
 import View
 
-hub = MovementFunctions.Mover(
+shoulder = MovementFunctions.Mover(
     17,
     min_angle=0,
     max_angle=180,
