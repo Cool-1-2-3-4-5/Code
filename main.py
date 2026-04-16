@@ -16,36 +16,36 @@ import MovementFunctions
 import ChessLibrary
 import Learn
 import View
-
-shoulder = AngularServo(
+MovementFunctions.Mover
+shoulder = MovementFunctions.Mover(
     17,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
-arm = AngularServo(
+arm = MovementFunctions.Mover(
     27,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
-forearm = AngularServo(
+forearm = MovementFunctions.Mover(
     22,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
-wrist = AngularServo(
+wrist = MovementFunctions.Mover(
     23,
     min_angle=0,
     max_angle=180,
     min_pulse_width=0.5 / 1000,    # 0.5 ms
     max_pulse_width=2.5 / 1000     # 2.5 ms
 )
-gripper = AngularServo(
+gripper = MovementFunctions.Mover(
     24,
     min_angle=0,
     max_angle=180,
@@ -63,7 +63,6 @@ vision.destroyAllWindows()
 main = Learn.board_setup(cap)
 
 # Motor movements
-MovementFunctions.servo_loader(shoulder,arm,forearm,wrist,gripper)
 MovementFunctions.reset_angles()
 
 # Chess Setup
