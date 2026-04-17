@@ -159,6 +159,9 @@ def board_setup(cap):
     cv2.destroyAllWindows()
 
 def board_update(cap,board_info):
+    for buffer in range(5):
+        cap.read()
+    
     success, frame = cap.read()
     if not success:
         return
