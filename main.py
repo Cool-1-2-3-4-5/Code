@@ -75,14 +75,14 @@ MovementFunctions.reset_angles()
 
 # OpenCV Setup
 cap = vision.VideoCapture(0)
-cap.set(vision.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(vision.CAP_PROP_FRAME_HEIGHT, 640)
-vision.destroyAllWindows()
+cap.set(vision.CAP_PROP_FRAME_WIDTH, 480)
+cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 
 
 gui.write("Welcome to the Robot vs Human Chess Board Game! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",3,20)
 gui.write("First set up the board!\n Enter the four corners of the chess board in any order\n to continue","setup",3,20)
 main = Learn.board_setup(cap)
+vision.destroyAllWindows()
 
 # GAME LOGIC
 

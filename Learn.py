@@ -8,7 +8,7 @@ import json
 
 
 # Display dimensions
-size = 640
+size = 480
 
 # Calibration Data
 cameraMatrix = np.array([
@@ -94,7 +94,9 @@ def draw_board_grid_overlay(frame):
     return frame
 
 def board_setup(cap):
-    cv2.namedWindow("Frame")
+    cv2.namedWindow("Frame",cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Frame", 600, 600)
+
     # Tell OpenCV to run 'mouse_callback' when events happen in the "Frame" window
     cv2.setMouseCallback("Frame", mouse_callback)
     main_set = set()
@@ -149,7 +151,7 @@ def board_setup(cap):
                     # board_dict[string] = borders_list
             
             cv2.imshow("warped", warped_version)
-            cv2.waitKey(200)
+            cv2.waitKey(400)
             return sorted_corners
 
         cv2.imshow("Frame", frame)
@@ -181,10 +183,8 @@ def board_update(cap,board_info):
     draw_board_grid_overlay(chess_board)
     
     # Save or display results
-    cv2.imshow("images_save/Main_Frame.jpg", chess_board)
-    cv2.imshow("images_save/black_pieces.jpg", black_pieces)
-    cv2.imshow("images_save/gray.jpg", imgray)
-    cv2.waitKey(20)
+    cv2.imshow("Pieces", chess_board)
+    cv2.waitKey(500)
     return locations
 
 def perspective_view(frame, board_info):
@@ -200,9 +200,12 @@ def perspective_view(frame, board_info):
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     print("Starting chess board detection...")
     corners = board_setup(cap)
     main = board_update(cap,corners)
+    
     # try:
     #     # Load pre-calibrated board info from file
     #     main = load_board_calibration()
@@ -219,9 +222,6 @@ if __name__ == "__main__":
     #         if location not in setup:
     #              setup.append(location)
     # print(setup)
-
-
-
 
 
 
