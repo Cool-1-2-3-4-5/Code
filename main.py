@@ -76,7 +76,7 @@ MovementFunctions.reset_angles()
 # OpenCV Setup
 cap = vision.VideoCapture(0)
 cap.set(vision.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
+cap.set(vision.CAP_PROP_FRAME_HEIGHT, 640)
 vision.destroyAllWindows()
 
 

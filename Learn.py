@@ -8,7 +8,7 @@ import json
 
 
 # Display dimensions
-size = 480
+size = 640
 
 # Calibration Data
 cameraMatrix = np.array([
