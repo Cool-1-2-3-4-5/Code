@@ -227,7 +227,7 @@ def drop_piece(interval=0.5):
     sleep(interval)
     hub.set_angle(0)
     sleep(interval)
-    wrist.set_angle(40)
+    wrist.set_angle(15)
     sleep(interval)
     gripper.set_angle(0)
     sleep(interval)
