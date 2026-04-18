@@ -79,7 +79,7 @@ cap.set(vision.CAP_PROP_FRAME_WIDTH, 480)
 cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 
 
-gui.write("Welcome to the Robot vs Human Chess Board Game! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",3,20)
+gui.write("Welcome to the Robot vs Human Chess Board Game!!! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",15,20)
 gui.write("First set up the board!\n Enter the four corners of the chess board in any order\n to continue","setup",3,20)
 main = Learn.board_setup(cap)
 vision.destroyAllWindows()
@@ -99,8 +99,10 @@ gui.delay(2)
 legal_moves = list(gui.chess_logic.legal_moves)
 random_index = random.randint(0, len(legal_moves) - 1)
 random_move = legal_moves[random_index]
-gui.chess_logic.push(random_move)
+gui.chess_logic.push_uci("f2f4")
 gui.update_board()
+MovementFunctions.robotTurnToPlay("Regular","f2f4")
+
 
 # Black and white flip-flop (Robot is White, user is black)
 while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
@@ -118,6 +120,7 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
     
     # Return locations (x,y) of black pieces and evalute at what squares there is a piece
     locations = Learn.board_update(cap, main)
+    vision.destroyAllWindows()
     setup = []
     if locations:
         for mid in locations:
