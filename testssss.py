@@ -148,6 +148,7 @@ def board_setup(cap):
             cv2.imshow("warped", warped_version)
             cv2.waitKey(400)
             return sorted_corners
+        
         cv2.resizeWindow("Frame", 600, 600)
         cv2.imshow("Frame", frame)
         cv2.setMouseCallback("Frame", mouse_callback)
@@ -199,11 +200,10 @@ def perspective_view(frame, board_info):
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
     print("Starting chess board detection...")
     corners = board_setup(cap)
-    main = board_update(cap,corners)
     
     # try:
     #     # Load pre-calibrated board info from file
