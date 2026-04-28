@@ -28,7 +28,7 @@ class ChessboardUI:
 
 
         # Board parameters
-        self.square_size = 105
+        self.square_size = 110
         self.board_size = 8
         
         # Create canvas
@@ -132,10 +132,8 @@ if __name__ == "__main__":
     root = tk.Tk()
     bot = chess.Board()
     gui = ChessboardUI(root, bot)
-    
-    gui.write("Welcome to the Robot vs Human Chess Board Game! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",3,20)
-    gui.write("LETS START THE GAME\nIN 5 SECONDS","second_start",5,40)
-    gui.write("LETS BEGIN!","third_start",2,50)
+    gui.write("First set up the board! Enter\nthe four corners of the chess\nboard in any order to continue","setup",3,45)
+
     gui.setboard()
     gui.root.update()
     gui.delay(2)
@@ -146,7 +144,7 @@ if __name__ == "__main__":
         gui.root.update()
     gui.chess_logic.push_uci("f2f4")
     gui.update_board()
-    if gui.chess_logic.is_check:
+    if gui.chess_logic.is_check():
         gui.write("Black in Check\n","Check",2,50,True)
     
     gui.root.bind('<space>',gui.pressed)
@@ -232,7 +230,6 @@ if __name__ == "__main__":
 
     # Game loop
     # Robot goes first (Robot is White)
-    print("here")
     while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
         print("Hi")
         gui.root.bind('<space>',gui.pressed)

@@ -78,9 +78,8 @@ cap = vision.VideoCapture(0)
 cap.set(vision.CAP_PROP_FRAME_WIDTH, 480)
 cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 
-
-gui.write("Welcome to the Robot vs Human Chess Board Game!!! \nWhite to go first. Once turn is done press 'space bar'\n to confirms your move","start",15,20)
-gui.write("First set up the board!\n Enter the four corners of the chess board in any order\n to continue","setup",3,20)
+gui.write("Welcome to the Robot vs Human\nChess Board Game! White to go\nfirst. Once turn is done press\n'space bar' to confirms your move","start",6,40)
+gui.write("First set up the board! Enter\nthe four corners of the chess\nboard in any order to continue","setup",3,45)
 main = Learn.board_setup(cap)
 vision.destroyAllWindows()
 
