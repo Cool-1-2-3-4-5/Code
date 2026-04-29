@@ -186,6 +186,36 @@ def board_update(cap,board_info):
     cv2.waitKey(500)
     return locations
 
+def black_tester(cap,board_info):
+    while True:
+        success, frame = cap.read()
+        if not success:
+            return
+    
+        frame = preprocess_frame(frame)
+        frame = perspective_view(frame,board_info) 
+        analysis_frame = frame.copy()
+        chess_board = analysis_frame.copy()
+        imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
+        ret, black_pieces = cv2.threshold(imgray, 70, 255, cv2.THRESH_BINARY_INV)
+        black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        locations = []
+        for i in black_countours:
+            noise = cv2.contourArea(i)
+            if 100 < noise < 7000:
+                x, y, width, height = cv2.boundingRect(i)
+                cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
+                cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
+                locations.append((int(x+(width/2)), int(y+(height/2))))
+
+        # Overlay grid only after analysis, as a user reference.
+        draw_board_grid_overlay(chess_board)
+    
+        # Save or display results
+        cv2.imshow("Pieces", chess_board)
+        cv2.imshow("Black_Only", black_pieces)
+        cv2.waitKey(20)
+
 def perspective_view(frame, board_info):
     TL = board_info[0] 
     TR = board_info[1]
@@ -203,7 +233,8 @@ if __name__ == "__main__":
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     print("Starting chess board detection...")
     corners = board_setup(cap)
-    main = board_update(cap,corners)
+    # main = board_update(cap,corners)
+    black_tester(cap,corners)
     
     # try:
     #     # Load pre-calibrated board info from file
