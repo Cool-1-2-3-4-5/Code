@@ -147,12 +147,12 @@ def board_setup(cap):
             warped_version = cv2.resize(warped_version,(800,800))
             cv2.imshow("warped", warped_version)
             cv2.waitKey(400)
+            cv2.destroyAllWindows()
             return sorted_corners
-        cv2.resizeWindow("Frame", 600, 600)
+        cv2.resizeWindow("Frame", 800, 1000)
         cv2.imshow("Frame", frame)
         cv2.setMouseCallback("Frame", mouse_callback)
         cv2.waitKey(20)
-    cv2.destroyAllWindows()
 
 def board_update(cap,board_info):
     for buffer in range(5):
@@ -182,6 +182,7 @@ def board_update(cap,board_info):
     draw_board_grid_overlay(chess_board)
     
     # Save or display results
+    chess_board = cv2.resize(chess_board,(800,800))
     cv2.imshow("Pieces", chess_board)
     cv2.waitKey(500)
     return locations
@@ -212,6 +213,8 @@ def black_tester(cap,board_info):
         draw_board_grid_overlay(chess_board)
     
         # Save or display results
+        chess_board = cv2.resize(chess_board,(800,800))
+        black_pieces = cv2.resize(black_pieces,(800,800))
         cv2.imshow("Pieces", chess_board)
         cv2.imshow("Black_Only", black_pieces)
         cv2.waitKey(20)
@@ -229,8 +232,6 @@ def perspective_view(frame, board_info):
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     print("Starting chess board detection...")
     corners = board_setup(cap)
     # main = board_update(cap,corners)
