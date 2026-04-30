@@ -185,12 +185,14 @@ def capture_move(move,interval=0.5):
     # first set
     hub.set_angle(positions[0])
     sleep(interval)
+    move_across(positions[1]+3,positions[2]+3)
+    sleep(0.2)
     move_across(positions[1],positions[2])
     sleep(interval)
     wrist.set_angle(positions[3])
-    sleep(interval+1)
+    sleep(interval)
     gripper.set_angle(37)
-    sleep(interval+1)
+    sleep(interval)
     
     #Go down
     move_arm_with_wrist(positions[4])
@@ -208,16 +210,18 @@ def capture_move(move,interval=0.5):
 
     # Drop Piece
     drop_piece()
-
     # Next Square
     second_half = move[0] + move[1]
 
     positions2 = data[second_half]
-    
+    # reset_angles(positions2[0])
+    # sleep(interval)
     # Go to next square:
     
     hub.set_angle(positions2[0])
     sleep(interval)
+    move_across(positions2[1]+3,positions2[2]+3)
+    sleep(0.2)
     move_across(positions2[1],positions2[2])
     sleep(interval)
     wrist.set_angle(positions2[3])
