@@ -78,7 +78,7 @@ cap = vision.VideoCapture(0)
 cap.set(vision.CAP_PROP_FRAME_WIDTH, 480)
 cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 
-gui.write("Welcome to the Robot vs Human\nChess Board Game! White to go\nfirst. Once turn is done press\n'space bar' to confirms your move","start",6,40)
+gui.write("Wselcome to the Robot vs Human\nChess Board Game! White to go\nfirst. Once turn is done press\n'space bar' to confirms your move","start",6,40)
 gui.write("First set up the board! Enter\nthe four corners of the chess\nboard in any order to continue","setup",3,45)
 main = Learn.board_setup(cap)
 vision.destroyAllWindows()
@@ -130,6 +130,7 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
 
         # Determining chess piece squares based on (x,y) of pieces
         user_move_in_UCI = Learn.eval_board(prev_piece_locations,setup)
+        print("Best move: " + user_move_in_UCI)
         prev_piece_locations = setup.copy()
         if chess.Move.from_uci(user_move_in_UCI) in gui.chess_logic.legal_moves:
             gui.chess_logic.push_uci(user_move_in_UCI)

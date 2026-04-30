@@ -63,14 +63,18 @@ def piece_in_square(middle_of_piece):
 def eval_board(prev_setup_main,current_setup_main):
     prev_setup = prev_setup_main.copy()
     current_setup = current_setup_main.copy()
+    print("start: " + str(prev_setup))
+    print("start_cur: " + str(current_setup))
     string = ''
     x = []
-    for update in prev_setup:
+    for update in prev_setup_main:
         if update in current_setup:
             prev_setup.remove(update)
             current_setup.remove(update)
         else: #updated move
             string += update
+        print("update: " + str(prev_setup))
+        print("update_cur: " + str(current_setup))
     string += current_setup[0]
     return string
 
@@ -146,7 +150,7 @@ def board_setup(cap):
                     # board_dict[string] = borders_list
             warped_version = cv2.resize(warped_version,(800,800))
             cv2.imshow("warped", warped_version)
-            cv2.waitKey(400)
+            cv2.waitKey(5000)
             cv2.destroyAllWindows()
             return sorted_corners
         cv2.resizeWindow("Frame", 800, 1000)
@@ -155,7 +159,7 @@ def board_setup(cap):
         cv2.waitKey(20)
 
 def board_update(cap,board_info):
-    for buffer in range(5):
+    for buffer in range(20):
         cap.read()
     
     success, frame = cap.read()
@@ -167,7 +171,7 @@ def board_update(cap,board_info):
     analysis_frame = frame.copy()
     chess_board = analysis_frame.copy()
     imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
-    ret, black_pieces = cv2.threshold(imgray, 70, 255, cv2.THRESH_BINARY_INV)
+    ret, black_pieces = cv2.threshold(imgray, 90, 255, cv2.THRESH_BINARY_INV)
     black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     locations = []
     for i in black_countours:
@@ -184,7 +188,8 @@ def board_update(cap,board_info):
     # Save or display results
     chess_board = cv2.resize(chess_board,(800,800))
     cv2.imshow("Pieces", chess_board)
-    cv2.waitKey(500)
+    cv2.imshow("Black_Version", black_pieces)
+    cv2.waitKey(5000)
     return locations
 
 def black_tester(cap,board_info):
