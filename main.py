@@ -64,6 +64,7 @@ prev_piece_locations = [
 ]
 bot = chess.Board()
 white_won = True
+stalemate = False
 
 # UI
 root = tk.Tk()
@@ -165,17 +166,23 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
                 if gui.chess_logic.is_check():
                     gui.write("Black in Check\n","Check",2,50,True)
                     gui.root.update()
-            else: #Black Won
+            elif gui.chess_logic.is_checkmate():  #Black Won
                 white_won = False
+            else:
+                stalemate = True
         else: # ADD HERE TO ALLOW FOR USER TO FIX THEIR MOVE
             print("Not Valid move, program crashed")
             break
     else:
         print("Error with Camera Viewing")
         break
+if gui.chess_logic.is_stalemate():
+    stalemate = True
 gui.clear_text("all")
 gui.delay(1)
-if white_won:
+if stalemate:
+    text = "Stalemate!\nPlease Play Again!"
+elif white_won:
     text = "Robot has won!\nPlease Play Again!"
 else:
     text = "Human has won!\nPlease Play Again!"
