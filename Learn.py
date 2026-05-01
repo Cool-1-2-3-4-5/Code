@@ -102,7 +102,7 @@ def board_setup(cap):
     main_set = set()
     board_length = []
     while True:
-        cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
+        cv2.namedWindow("Setup", cv2.WINDOW_NORMAL)
         success, frame = cap.read()
         if not success:
             break        
@@ -116,6 +116,7 @@ def board_setup(cap):
             cv2.circle(frame, i, 5, (0, 0, 255), -1)
 
         if len(main_set) == 4:
+            cv2.destroyAllWindows()
             pts = list(main_set)
             pts.sort(key=lambda p: p[1])
             top_pts = sorted(pts[:2], key=lambda p: p[0])
@@ -149,13 +150,13 @@ def board_setup(cap):
                     cv2.circle(warped_version, (x_second,y_second), 2, (255,0, 255), -1)
                     # board_dict[string] = borders_list
             warped_version = cv2.resize(warped_version,(800,800))
-            cv2.imshow("warped", warped_version)
+            cv2.imshow("Warped Frame", warped_version)
             cv2.waitKey(5000)
             cv2.destroyAllWindows()
             return sorted_corners
-        cv2.resizeWindow("Frame", 800, 1000)
-        cv2.imshow("Frame", frame)
-        cv2.setMouseCallback("Frame", mouse_callback)
+        cv2.resizeWindow("Setup", 800, 1000)
+        cv2.imshow("Setup", frame)
+        cv2.setMouseCallback("Setup", mouse_callback)
         cv2.waitKey(20)
 
 def board_update(cap,board_info):
@@ -187,8 +188,7 @@ def board_update(cap,board_info):
     
     # Save or display results
     chess_board = cv2.resize(chess_board,(800,800))
-    cv2.imshow("Pieces", chess_board)
-    cv2.imshow("Black_Version", black_pieces)
+    cv2.imshow("Updated Board", chess_board)
     cv2.waitKey(5000)
     return locations
 

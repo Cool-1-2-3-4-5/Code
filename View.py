@@ -28,7 +28,7 @@ class ChessboardUI:
 
 
         # Board parameters
-        self.square_size = 110
+        self.square_size = 125
         self.board_size = 8
         
         # Create canvas
@@ -130,6 +130,7 @@ class ChessboardUI:
         
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("My Custom Window Name")
     bot = chess.Board()
     gui = ChessboardUI(root, bot)
     gui.write("First set up the board! Enter\nthe four corners of the chess\nboard in any order to continue","setup",3,45)

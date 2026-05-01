@@ -67,6 +67,7 @@ white_won = True
 
 # UI
 root = tk.Tk()
+root.title("Chess Game GUI")
 gui = View.ChessboardUI(root, bot)
 
 # Motor movements
@@ -78,16 +79,16 @@ cap = vision.VideoCapture(0)
 cap.set(vision.CAP_PROP_FRAME_WIDTH, 480)
 cap.set(vision.CAP_PROP_FRAME_HEIGHT, 480)
 
-gui.write("Wselcome to the Robot vs Human\nChess Board Game! White to go\nfirst. Once turn is done press\n'space bar' to confirms your move","start",6,40)
-gui.write("First set up the board! Enter\nthe four corners of the chess\nboard in any order to continue","setup",3,45)
+gui.write("Welcome to the Robot vs Human\nChess Board Game! White to go\nfirst. Once turn is done press\n'space bar' to confirms your move","start",6,45)
+gui.write("First set up the board! Enter\nthe four corners of the chess\nboard in any order to continue","setup",3,50)
 main = Learn.board_setup(cap)
 vision.destroyAllWindows()
 
 # GAME LOGIC
 
 # Game Opener
-gui.write("Great!\nLETS START THE GAME\nIN 5 SECONDS","second_start",5,40)
-gui.write("LETS BEGIN!","third_start",2,50)
+gui.write("Great!\nLETS START THE GAME\nIN 5 SECONDS","second_start",5,50)
+gui.write("LETS BEGIN!","third_start",2,80)
 gui.setboard()
 gui.root.update()
 gui.delay(2)
