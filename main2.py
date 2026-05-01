@@ -1,60 +1,60 @@
 import chess
-# from gpiozero import Device, AngularServo
-# from gpiozero.pins.pigpio import PiGPIOFactory
+from gpiozero import Device, AngularServo
+from gpiozero.pins.pigpio import PiGPIOFactory
 import json
 import tkinter as tk
 
 # Set up pigpio pin factory for hardware PWM (reduces servo jitter)
-# Device.pin_factory = PiGPIOFactory()
+Device.pin_factory = PiGPIOFactory()
 
 import time
 from time import sleep
 import random
 
-# import MovementFunctions
+import MovementFunctions
 import ChessLibrary
-# import Learn
+import Learn
 import View
 
-# shoulder = MovementFunctions.Mover(
-#     17,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width= 0.7 / 1000,
-#     max_pulse_width= 2 / 1000
-# )
-# 
-# arm = MovementFunctions.Mover(
-#     27,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width= 0.5 / 1000,
-#     max_pulse_width= 2.4 / 1000
-# )
-# 
-# forearm = MovementFunctions.Mover(
-#     22,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width= 0.5 / 1000,
-#     max_pulse_width= 2.38 / 1000
-# )
-# 
-# wrist = MovementFunctions.Mover(
-#     23,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width= 0.5 / 1000,
-#     max_pulse_width= 2.4 / 1000
-# )
-# 
-# gripper = MovementFunctions.Mover(
-#     24,
-#     min_angle=0,
-#     max_angle=180,
-#     min_pulse_width= 0.5 / 1000,
-#     max_pulse_width= 2.4 / 1000
-# )
+shoulder = MovementFunctions.Mover(
+    17,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.7 / 1000,
+    max_pulse_width= 2 / 1000
+)
+
+arm = MovementFunctions.Mover(
+    27,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
+)
+
+forearm = MovementFunctions.Mover(
+    22,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.38 / 1000
+)
+
+wrist = MovementFunctions.Mover(
+    23,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
+)
+
+gripper = MovementFunctions.Mover(
+    24,
+    min_angle=0,
+    max_angle=180,
+    min_pulse_width= 0.5 / 1000,
+    max_pulse_width= 2.4 / 1000
+)
 
 # Chess Setup - Load FEN
 fen_string = "3k4/2ppp3/7Q/p4p2/P1P2P2/8/1P1PP1PP/RNB1KBNR w KQ - 0"
@@ -67,8 +67,8 @@ root.title("Chess Game GUI")
 gui = View.ChessboardUI(root, bot)
 
 # Motor movements
-# MovementFunctions.servo_loader(shoulder, arm, forearm, wrist, gripper)
-# MovementFunctions.reset_angles(90)
+MovementFunctions.servo_loader(shoulder, arm, forearm, wrist, gripper)
+MovementFunctions.reset_angles(90)
 
 # Set hub to 90 degrees
 gui.setboard()
@@ -84,7 +84,7 @@ move_uci = "h6h8"
 move_type = "Regular"
 
 # Execute robot movement
-# MovementFunctions.robotTurnToPlay(move_type, move_uci)
+MovementFunctions.robotTurnToPlay(move_type, move_uci)
 
 # Update the board with the move
 gui.chess_logic.push_uci(move_uci)
