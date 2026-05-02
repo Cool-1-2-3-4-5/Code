@@ -57,7 +57,7 @@ gripper = MovementFunctions.Mover(
 )
 
 # Chess Setup - Load FEN
-fen_string = "3k4/2ppp3/7Q/p4p2/P1P2P2/8/1P1PP1PP/RNB1KBNR w KQ - 0"
+fen_string = "3k4/2ppp3/7Q/p1r1Pp2/P1P2P2/1P2K1P1/8/8 w - - 0 1"
 bot = chess.Board(fen_string)
 white_won = True
 
@@ -69,6 +69,7 @@ gui = View.ChessboardUI(root, bot)
 # Motor movements
 MovementFunctions.servo_loader(shoulder, arm, forearm, wrist, gripper)
 MovementFunctions.reset_angles(90)
+gui.delay(5)
 
 # Set hub to 90 degrees
 gui.setboard()
@@ -76,7 +77,7 @@ gui.root.update()
 
 # Wait 5 seconds before moving
 print("Waiting 5 seconds before robot moves...")
-gui.delay(5)
+gui.delay(3)
 
 # Robot Move from h6 to h8
 print("Robot moving from h6 to h8...")
@@ -89,8 +90,9 @@ MovementFunctions.robotTurnToPlay(move_type, move_uci)
 # Update the board with the move
 gui.chess_logic.push_uci(move_uci)
 gui.update_board()
+gui.write("Black in Checkmate\n","Check",2,50,True)
 gui.root.update()
-gui.delay(2)
+gui.delay(3)
 
 gui.clear_text("all")
 gui.delay(1)
@@ -98,5 +100,6 @@ if white_won:
     text = "Robot has won!\nPlease Play Again!"
 else:
     text = "Human has won!\nPlease Play Again!"
-gui.write(text,"Who_won",5,50)
+gui.write(text,"Who_won",5,80)
+MovementFunctions.end_angle()
 root.mainloop()
