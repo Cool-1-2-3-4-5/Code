@@ -1,14 +1,9 @@
 import chess
 from gpiozero import Device, AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
-import json
 import tkinter as tk
-# Set up pigpio pin factory for hardware PWM (reduces servo jitter)
-Device.pin_factory = PiGPIOFactory()
-# import os
-# os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+Device.pin_factory = PiGPIOFactory() # (reduces servo jitter)
 import cv2 as vision
-import time
 from time import sleep
 import random
 
@@ -48,6 +43,7 @@ wrist = MovementFunctions.Mover(
     min_pulse_width= 0.5 / 1000,
     max_pulse_width= 2.4 / 1000
 )
+
 gripper = MovementFunctions.Mover(
     24,
     min_angle=0,
@@ -65,6 +61,7 @@ prev_piece_locations = [
 bot = chess.Board()
 white_won = True
 stalemate = False
+crashcheck = False
 
 # UI
 root = tk.Tk()
@@ -100,9 +97,9 @@ gui.delay(2)
 legal_moves = list(gui.chess_logic.legal_moves)
 random_index = random.randint(0, len(legal_moves) - 1)
 random_move = legal_moves[random_index]
-gui.chess_logic.push_uci("f2f4")
+gui.chess_logic.push(random_move)
 gui.update_board()
-MovementFunctions.robotTurnToPlay("Regular","f2f4")
+MovementFunctions.robotTurnToPlay("Regular", str(random_move.uci()))
 
 
 # Black and white flip-flop (Robot is White, user is black)
@@ -132,11 +129,9 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
 
         # Determining chess piece squares based on (x,y) of pieces
         user_move_in_UCI = Learn.eval_board(prev_piece_locations,setup)
-        print("Best move: " + user_move_in_UCI)
         prev_piece_locations = setup.copy()
         if chess.Move.from_uci(user_move_in_UCI) in gui.chess_logic.legal_moves:
             gui.chess_logic.push_uci(user_move_in_UCI)
-            print("User played: " + user_move_in_UCI)
             gui.update_board()
             gui.root.update()
             if gui.chess_logic.is_check():
@@ -170,23 +165,31 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
                 white_won = False
             else:
                 stalemate = True
-        else: # ADD HERE TO ALLOW FOR USER TO FIX THEIR MOVE
-            print("Not Valid move, program crashed")
+        else:
+            gui.clear_text("all")
+            gui.delay(1)
+            gui.write("Not Valid move, program crashed","Issue",5,50)
+            crashcheck = True
             break
     else:
-        print("Error with Camera Viewing")
+        gui.clear_text("all")
+        gui.delay(1)
+        gui.write("Error with Camera Viewing","Issue",5,50)
+        crashcheck = True
         break
-if gui.chess_logic.is_stalemate():
-    stalemate = True
-gui.clear_text("all")
-gui.delay(1)
-if stalemate:
-    text = "Stalemate!\nPlease Play Again!"
-elif white_won:
-    text = "Robot has won!\nPlease Play Again!"
-else:
-    text = "Human has won!\nPlease Play Again!"
-gui.write(text,"Who_won",5,50)
-root.mainloop()
+
+if not crashcheck:
+    if gui.chess_logic.is_stalemate():
+        stalemate = True
+    gui.clear_text("all")
+    gui.delay(1)
+    if stalemate:
+        text = "Stalemate!\nPlease Play Again!"
+    elif white_won:
+        text = "Robot has won!\nPlease Play Again!"
+    else:
+        text = "Human has won!\nPlease Play Again!"
+    gui.write(text,"Who_won",5,50)
+gui.delay(3)
 cap.release()
 vision.destroyAllWindows()

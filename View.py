@@ -1,7 +1,6 @@
 import tkinter as tk
 import chess
 import time
-import random
 
 class ChessboardUI:
     def __init__(self, root, chess_logic):
@@ -76,8 +75,6 @@ class ChessboardUI:
                 piece = self.chess_logic.piece_at(chess.square(col, row))
                 if piece == None:
                     continue
-                else:
-                    print(chess.square(col, row))
                 x = (7-col) * self.square_size + (self.square_size // 2)
                 y = row * self.square_size + (self.square_size // 2)
                 
@@ -124,135 +121,6 @@ class ChessboardUI:
         initial = time.time()
         while time.time() < initial + length:
             pass
+
     def pressed(self,event):
-        print("pressed")
         self.state = True
-        
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("My Custom Window Name")
-    bot = chess.Board()
-    gui = ChessboardUI(root, bot)
-    gui.write("First set up the board! Enter\nthe four corners of the chess\nboard in any order to continue","setup",3,45)
-
-    gui.setboard()
-    gui.root.update()
-    gui.delay(2)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("f2f4")
-    gui.update_board()
-    if gui.chess_logic.is_check():
-        gui.write("Black in Check\n","Check",2,50,True)
-    
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("f7f5")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("White in Check\n","Check",2,50,True)
-    
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("c2c4")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("Black in Check\n","Check",2,50,True)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("b8c6")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("White in Check\n","Check",2,50,True)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("a2a4")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("Black in Check\n","Check",2,50,True)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("c6b4")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("White in Check\n","Check",2,50,True)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("d1b3")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("Black in Check\n","Check",2,50,True)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("b4c2")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("White in Check\n","Check",2,50,True)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("b3c2")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("Black in Check\n","Check",2,50,True)
-
-    gui.root.bind('<space>',gui.pressed)
-    gui.state = False
-    while not gui.state:
-        gui.root.update()
-    gui.chess_logic.push_uci("a7a5")
-    gui.update_board()
-    if gui.chess_logic.is_check:
-        gui.write("White in Check\n","Check",2,50,True)
-
-    # Game loop
-    # Robot goes first (Robot is White)
-    while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
-        print("Hi")
-        gui.root.bind('<space>',gui.pressed)
-        gui.state = False
-        while not gui.state:
-            gui.root.update()
-        legal_moves = list(gui.chess_logic.legal_moves)
-        random_index = random.randint(0, len(legal_moves) - 1)
-        random_move = legal_moves[random_index]
-        gui.chess_logic.push_uci("f2f4")
-        gui.update_board()
-        print(gui.chess_logic)
-        gui.write("Black in Check\n","New",2,50,True)
-        if not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
-            gui.root.bind('<space>',gui.pressed)
-            gui.state = False
-            while not gui.state:
-                gui.root.update()
-            legal_moves = list(gui.chess_logic.legal_moves)
-            random_index = random.randint(0, len(legal_moves) - 1)
-            random_move = legal_moves[random_index]
-            gui.chess_logic.push(random_move)
-            gui.update_board()
-            print("Done")
-    gui.root.mainloop()

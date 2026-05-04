@@ -44,7 +44,6 @@ def mouse_callback(event, x, y, flags, param):
     global click_point
     if event == cv2.EVENT_LBUTTONDOWN:
         click_point = (x, y)
-        print(f"Clicked at: {click_point}")
         corners.append(click_point)
 
 # which square piece is in
@@ -63,8 +62,6 @@ def piece_in_square(middle_of_piece):
 def eval_board(prev_setup_main,current_setup_main):
     prev_setup = prev_setup_main.copy()
     current_setup = current_setup_main.copy()
-    print("start: " + str(prev_setup))
-    print("start_cur: " + str(current_setup))
     string = ''
     x = []
     for update in prev_setup_main:
@@ -73,8 +70,6 @@ def eval_board(prev_setup_main,current_setup_main):
             current_setup.remove(update)
         else: #updated move
             string += update
-        print("update: " + str(prev_setup))
-        print("update_cur: " + str(current_setup))
     string += current_setup[0]
     return string
 
@@ -192,38 +187,6 @@ def board_update(cap,board_info):
     cv2.waitKey(5000)
     return locations
 
-def black_tester(cap,board_info):
-    while True:
-        success, frame = cap.read()
-        if not success:
-            return
-    
-        frame = preprocess_frame(frame)
-        frame = perspective_view(frame,board_info) 
-        analysis_frame = frame.copy()
-        chess_board = analysis_frame.copy()
-        imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
-        ret, black_pieces = cv2.threshold(imgray, 70, 255, cv2.THRESH_BINARY_INV)
-        black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        locations = []
-        for i in black_countours:
-            noise = cv2.contourArea(i)
-            if 100 < noise < 7000:
-                x, y, width, height = cv2.boundingRect(i)
-                cv2.rectangle(chess_board, (x, y), (x+width, y+height), (0, 255, 0), 2)
-                cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
-                locations.append((int(x+(width/2)), int(y+(height/2))))
-
-        # Overlay grid only after analysis, as a user reference.
-        draw_board_grid_overlay(chess_board)
-    
-        # Save or display results
-        chess_board = cv2.resize(chess_board,(800,800))
-        black_pieces = cv2.resize(black_pieces,(800,800))
-        cv2.imshow("Pieces", chess_board)
-        cv2.imshow("Black_Only", black_pieces)
-        cv2.waitKey(20)
-
 def perspective_view(frame, board_info):
     TL = board_info[0] 
     TR = board_info[1]
@@ -234,126 +197,3 @@ def perspective_view(frame, board_info):
     matrix = cv2.getPerspectiveTransform(src_points, final_pnts)
     warped = cv2.warpPerspective(frame, matrix, (size, size))
     return warped
-
-if __name__ == "__main__":
-    cap = cv2.VideoCapture(0)
-    print("Starting chess board detection...")
-    corners = board_setup(cap)
-    # main = board_update(cap,corners)
-    black_tester(cap,corners)
-    
-    # try:
-    #     # Load pre-calibrated board info from file
-    #     main = load_board_calibration()
-    # except FileNotFoundError:
-    #     print("ERROR: board_calibration.json not found!")
-    #     print("Run this script with HEADLESS=False on a display-enabled machine first to calibrate.")
-    #     exit(1)
-    
-    # locations = board_update(cap, main)
-    # setup = []
-    # for mid in locations:
-    #     location = piece_in_square(mid,main)
-    #     if location is not None:
-    #         if location not in setup:
-    #              setup.append(location)
-    # print(setup)
-
-
-
-
-
-
-
-
-
-
-# 1. Reading Images
-# image = cv.imread('Images/Birds.jpg')
-# cv.imshow("CHECK",image)
-# cv.waitKey(0)
-
-# # 2. Read webcam (or video)
-# cap = cv.VideoCapture(0) # intialize
-# while True:
-#     check, frame = cap.read() # function redes vudeo/webcam and return bool(frame was succefull or not) and frame
-#     cv.imshow("Vid",frame)
-#     if cv.waitKey(2000) & 0xFF == ord('d'): # id d is pressed and 
-#         break
-# cap.release()  # destroys memroy asssociated with opening wideo
-# cv.destroyAllWindows
-
-# # 3 Basic operation:
-# # Resize:
-# resized_img = cv.resize(image,(500,500))
-# cv.imshow("New",resized_img)
-# cv.waitKey(0)
-# # Crop:
-# cropped_img = image[100:200,50:200]
-# cv.imshow("New",cropped_img)d
-# cv.waitKey(0)
-
-
-# # 4. Convert colour:
-# gray_version = cv.cvtColor(image,cv.COLOR_BGR2GRAY)
-# cv.imshow("Gray",gray_version)
-# cv.waitKey(0)
-
-# # 5. Threshold (converty o remove discrepncies, perfect with gray scale)
-# isTrue, new_frame = cv.threshold(gray_version,80,200,cv.THRESH_BINARY) # Parametres: image,lower range, upper range,type) in inverse anything less thna rdg value goes to 0 and reverse for other
-# cv.imshow("Threshold", new_frame)
-# cv.waitKey(0)
-
-# # 5.1 Adaptive Threshold (Reular but better, threshold is different for each pixel)
-# new_frame = cv.adaptiveThreshold(gray_version,300,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,21,30) # Parametres: image,lower range, upper range,type) in inverse anything less thna rdg value goes to 0 and reverse for other
-# cv.imshow("adaptiveThreshold", new_frame)
-# cv.waitKey(0)
-
-# # 6. Edge Detection
-# 3 types but use Canny
-# edges = cv.Canny(image,280,30)
-# cv.imshow("EDGES",edges)
-# cv.waitKey(0)
-
-# # 7. Contours and bounding boxes (For white space, makes lines around them)
-# gray_version = cv.cvtColor(resized_img,cv.COLOR_BGR2GRAY)
-# cv.imshow("Gray", gray_version)
-# blurred = cv.GaussianBlur(gray_version, (5, 5), 0)
-# cv.imshow("After Blur", blurred)
-# thres = cv.adaptiveThreshold(blurred, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 11, 2)
-# # isTrue, thres = cv.threshold(blurred, 127, 255, cv.THRESH_BINARY_INV)
-# cv.imshow("Threshold", thres)
-# countours, hierachry = cv.findContours(thres, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-# for i in countours:
-#     area = cv.contourArea(i)
-#     print(area)
-#     if area > 100:
-#         x, y, width, height = cv.boundingRect(i)
-#         cv.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
-# cv.imshow("BoundingBox", image)
-# cv.waitKey(0)
-
-
-
-### EXAMPLES
-
-# # 1. Reading red on webcam:
-# cap = cv.VideoCapture(0) # intialize
-# while True:
-#     check, frame = cap.read() # function redes video/webcam and return bool(frame was succefull or not) and frame
-#     hue = cv.cvtColor(frame,cv.COLOR_BGR2HSV)
-#     colour_lower = np.array([0,130,80])
-#     colour_higher = np.array([20,255,255])
-#     object = cv.inRange(hue, colour_lower, colour_higher)
-#     countours, hierachry = cv.findContours(object, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-#     for i in countours:
-#         area = cv.contourArea(i)
-#         print(area)
-#         if area > 100:
-#             x, y, width, height = cv.boundingRect(i)
-#             cv.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
-#     cv.imshow("Vid",frame)
-#     if cv.waitKey(2) & 0xFF == ord('d'): # id d is pressed and 
-#         break
-# cap.release()  # destroys memroy asssociated with opening wideo
-# cv.destroyAllWindows
