@@ -198,7 +198,7 @@ def capture_move(move,interval=0.5):
     move_arm_with_wrist(positions[4])
     sleep(interval)
     
-    gripper.set_angle(46)
+    gripper.set_angle(60)
     sleep(interval)
 
     #Go Up
