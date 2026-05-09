@@ -39,7 +39,7 @@ def preprocess_frame(frame):
 
 click_point = None
 corners = []
-def mouse_callback(event, x, y, flags, param):
+def mouse_click(event, x, y, flags, param):
     global click_point
     if event == cv2.EVENT_LBUTTONDOWN:
         click_point = (x, y)
@@ -90,7 +90,7 @@ def draw_board_grid_overlay(frame):
     return frame
 
 def board_setup(cap):
-    # Run 'mouse_callback' when mouse clicked in the "Frame" window
+    # Run 'mouse_click' when mouse clicked in the "Frame" window
     main_set = set()
     while True:
         cv2.namedWindow("Setup", cv2.WINDOW_NORMAL)
@@ -146,22 +146,20 @@ def board_setup(cap):
             return sorted_corners
         cv2.resizeWindow("Setup", 800, 1000)
         cv2.imshow("Setup", frame)
-        cv2.setMouseCallback("Setup", mouse_callback)
+        cv2.setMouseCallback("Setup", mouse_click)
         cv2.waitKey(20)
 
 def board_update(cap,board_info):
     for buffer in range(20):
         cap.read()
     
-    success, frame = cap.read()
+    success, chess_board = cap.read()
     if not success:
         return
     
-    frame = preprocess_frame(frame)
-    frame = perspective_view(frame,board_info) 
-    analysis_frame = frame.copy()
-    chess_board = analysis_frame.copy()
-    imgray = cv2.cvtColor(analysis_frame, cv2.COLOR_BGR2GRAY)
+    chess_board = preprocess_frame(chess_board)
+    chess_board = perspective_view(chess_board,board_info)
+    imgray = cv2.cvtColor(chess_board, cv2.COLOR_BGR2GRAY)
     ret, black_pieces = cv2.threshold(imgray, 90, 255, cv2.THRESH_BINARY_INV)
     black_countours, hierachry = cv2.findContours(black_pieces, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     locations = []
@@ -173,10 +171,8 @@ def board_update(cap,board_info):
             cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
             locations.append((int(x+(width/2)), int(y+(height/2))))
 
-    # Overlay grid only after evaluation.
-    draw_board_grid_overlay(chess_board)
-    
-    # Save or display results
+    # overlay grid
+    draw_board_grid_overlay(chess_board)    
     chess_board = cv2.resize(chess_board,(800,800))
     cv2.imshow("Updated Board", chess_board)
     cv2.waitKey(5000)
