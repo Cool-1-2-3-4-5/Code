@@ -1,5 +1,4 @@
 import os
-# os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "1"
 import cv2 as cv2
 import numpy as np
 import time
@@ -7,7 +6,7 @@ import math
 import json
 
 
-# Display dimensions
+# Camera Dimensions
 size = 480
 
 # Calibration Data
@@ -74,28 +73,25 @@ def eval_board(prev_setup_main,current_setup_main):
     return string
 
 def draw_board_grid_overlay(frame):
-
     delta_x = size/8
     delta_y = size/8
     top_left = [0,0]
-
     x_start = int(top_left[0])
     y_start = int(top_left[1])
     x_end = int(x_start + (8 * delta_x))
     y_end = int(y_start + (8 * delta_y))
 
-    for idx in range(9):
-        x = int(x_start + (idx * delta_x))
-        y = int(y_start + (idx * delta_y))
+    for point in range(9):
+        x = int(x_start + (point * delta_x))
+        y = int(y_start + (point * delta_y))
         cv2.line(frame, (x, y_start), (x, y_end), (255, 255, 0), 1)
         cv2.line(frame, (x_start, y), (x_end, y), (255, 255, 0), 1)
 
     return frame
 
 def board_setup(cap):
-    # Tell OpenCV to run 'mouse_callback' when events happen in the "Frame" window
+    # Run 'mouse_callback' when mouse clicked in the "Frame" window
     main_set = set()
-    board_length = []
     while True:
         cv2.namedWindow("Setup", cv2.WINDOW_NORMAL)
         success, frame = cap.read()
@@ -103,7 +99,7 @@ def board_setup(cap):
             break        
         frame = preprocess_frame(frame)
 
-        # If we have clicked somewhere, draw a circle there
+        # Draw a circle at the "corner"
         if click_point is not None:
             main_set.add(click_point)
         
@@ -143,7 +139,6 @@ def board_setup(cap):
                     cv2.circle(warped_version, (x_second,y_first), 2, (255, 0, 0), -1)
                     cv2.circle(warped_version, (x_first,y_second), 2, (0, 255, 0), -1)
                     cv2.circle(warped_version, (x_second,y_second), 2, (255,0, 255), -1)
-                    # board_dict[string] = borders_list
             warped_version = cv2.resize(warped_version,(800,800))
             cv2.imshow("Warped Frame", warped_version)
             cv2.waitKey(5000)
@@ -178,7 +173,7 @@ def board_update(cap,board_info):
             cv2.circle(chess_board, (int(x+(width/2)), int(y+(height/2))), 2, (0, 0, 255), 2)
             locations.append((int(x+(width/2)), int(y+(height/2))))
 
-    # Overlay grid only after analysis, as a user reference.
+    # Overlay grid only after evaluation.
     draw_board_grid_overlay(chess_board)
     
     # Save or display results
