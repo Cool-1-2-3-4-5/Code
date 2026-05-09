@@ -9,7 +9,7 @@ import json
 # Camera Dimensions
 size = 480
 
-# Calibration Data
+# Calibration Matrixes
 cameraMatrix = np.array([
     [727.84220328, 0., 354.16226615],
     [0., 730.03025553, 221.97923977],

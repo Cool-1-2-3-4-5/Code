@@ -1,13 +1,5 @@
 import chess
 
-best_Score_List = []
-best_Moves_List = []
-
-def reset():
-    global best_Score_List, best_Moves_List
-    best_Score_List = []
-    best_Moves_List = []
-
 def minimax(bot, Possible_move, depth, WhiteTurn, alpha, beta, firstcall = True): # White is chess bot
     if depth == 0 or bot.is_checkmate():
         white_num = 1
@@ -34,13 +26,10 @@ def minimax(bot, Possible_move, depth, WhiteTurn, alpha, beta, firstcall = True)
             9*len(bot.pieces(chess.QUEEN, chess.BLACK)),
             90*black_num*len(bot.pieces(chess.KING, chess.BLACK))
         ])
-        moveList = set() # number of squares occupied by opposite team
+        moveList = set() # number of squares occupied by opposite side
         for move in bot.legal_moves:
-            newstr = bot.san(move)
-            iteration = -1
-            if not newstr[-1].isdigit(): # if move is check or checkmate
-                iteration = iteration-1
-            square = str(newstr[iteration-1]) + str(newstr[iteration])
+            newstr = move.uci()
+            square = newstr[-2:]
             moveList.add(square)
         number_of_squares += len(moveList)
         valueAtPossition = white_pieces*(depth+1) - black_pieces*(depth+1) - 0.8*number_of_squares
@@ -56,9 +45,6 @@ def minimax(bot, Possible_move, depth, WhiteTurn, alpha, beta, firstcall = True)
                 theBestMove = str(move)
                 theBestMoveinsan = bot.san(move)
             alpha = max(alpha,newScore)
-            if firstcall: # INTIAL MOVE
-                best_Score_List.append(bestScore)
-                best_Moves_List.append(move)
             if beta <= alpha:
                 break
         if firstcall:
