@@ -8,7 +8,7 @@ def reset():
     best_Score_List = []
     best_Moves_List = []
 
-def minimax(bot, Possible_move,depth,WhiteTurn, alpha,beta,firstcall = True): #Lets say black is chess bot
+def minimax(bot, Possible_move, depth, WhiteTurn, alpha, beta, firstcall = True): # White is chess bot
     if depth == 0 or bot.is_checkmate():
         white_num = 1
         black_num = 1
