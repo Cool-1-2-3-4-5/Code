@@ -1,6 +1,6 @@
 # Smart Chess Bot
 
-![Board](Board.jpg)
+![Board](Images/Board.jpg)
 
 SCB is a chess-playing robot that runs entirely on a Raspberry Pi 4. The robot plays white,
 you play black. The Robot moves its own pieces using a 5-DOF robotic arm while you make
@@ -14,7 +14,7 @@ The game starts by having you click the four corners of the chess board on the c
 which sets up a perspective-warped top-down view using OpenCV. From there, the robot makes
 the first move randomly and the game loop begins.
 
-![Board Setup and Tkinter GUI](IMG_5871.jpg)
+![Board Setup and Tkinter GUI](Images/IMG_5871.jpg)
 
 After each of your moves, you press spacebar to confirm. OpenCV captures the board, applies
 thresholding and contour detection to locate all black pieces, and maps their pixel positions
@@ -38,8 +38,8 @@ geometrically using triangle relationships, then stored in a JSON lookup table.
 This means at runtime the arm just reads the angles for the target square rather than solving
 any math on the fly.
 
-![Inverse Kinematics Manual Derivation (xy-place)](IK_xy_plane.heic)
-![Inverse Kinematics Manual Derivation (z-plane)](IK_z_plane.heic)
+![Inverse Kinematics Manual Derivation (xy-place)](Images/IK_xy_plane.heic)
+![Inverse Kinematics Manual Derivation (z-plane)](Images/IK_z_plane.heic)
 
 Threading is used to move joints simultaneously where needed.
 Captures are handled separately: the arm picks up the opponent's piece first, drops it off the board, then moves
@@ -49,7 +49,7 @@ its own piece into the square.
 
 ## Computer Vision
 
-![YOLOv8](Yolo.jpg)
+![YOLOv8](Images/Yolo.jpg)
 
 I initially tried training a YOLOv8 model on ~250 labelled images to detect individual piece
 types. It was only about 75% confident which is not reliable enough for a game logic
@@ -63,6 +63,6 @@ contour detection approach, which turned out to be more consistent for this setu
 All parts were designed in SolidWorks and 3D printed in PETG for strength. The arm has 5
 degrees of freedom driven by two 20kg-cm servos and one 35kg-cm servo. All components runs on a
 single Raspberry Pi 4, no separate microcontroller needed.
-![Main Robot Assembly](Robot.HEIC)
-![3D Printed Parts](Parts.heic)
-![Hub assembly](Hub.HEIC)
+![Main Robot Assembly](Images/Robot.HEIC)
+![3D Printed Parts](Images/Parts.heic)
+![Hub assembly](Images/Hub.HEIC)
