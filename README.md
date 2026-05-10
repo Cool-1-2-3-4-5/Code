@@ -69,3 +69,11 @@ single Raspberry Pi 4, no separate microcontroller needed.
 <img src="Images/Parts.jpg" width="400"/>
 
 <img src="Images/Hub.jpg" width="400"/>
+
+---
+
+## Links
+
+- [Website](https://your-website.com)
+
+- [YouTube Demo](https://your-youtube-link.com)
