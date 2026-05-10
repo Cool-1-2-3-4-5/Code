@@ -34,8 +34,8 @@ This means at runtime the arm just reads the angles for the target square rather
 any math on the fly.
 
 <p>
-  <img src="Images/IK_xy_plane.jpg" width="45%"/>
-  <img src="Images/IK_z_plane.jpg" width="45%"/>
+  <img src="Images/IK_xy_plane.jpg" width="45%" height="300"/>
+  <img src="Images/IK_z_plane.jpg" width="45%" height="300"/>
 </p>
 Threading is used to move joints simultaneously where needed.
 Captures are handled separately: the arm picks up the opponent's piece first, drops it off the board, then moves
