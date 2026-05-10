@@ -14,7 +14,8 @@ The game starts by having you click the four corners of the chess board on the c
 which sets up a perspective-warped top-down view using OpenCV. From there, the robot makes
 the first move randomly and the game loop begins.
 
-![Board Setup and Tkinter GUI](Images/IMG_5871.jpg)
+![Board Setup](Images/Board_Setup.png)
+![Tkinter GUI](Images/GUI.png)
 
 After each of your moves, you press spacebar to confirm. OpenCV captures the board, applies
 thresholding and contour detection to locate all black pieces, and maps their pixel positions
