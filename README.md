@@ -1,11 +1,15 @@
 # Smart Chess Bot
+
 <img src="Images/Board.jpg" width="600"/>
 
 SCB is a chess-playing robot that runs entirely on a Raspberry Pi 4. The robot plays white,
 you play black. The Robot moves its own pieces using a 5-DOF robotic arm while you make
 your moves on the real board.
+
 ---
+
 ## How It Works
+
 The game starts by having you click the four corners of the chess board on the camera feed,
 which sets up a perspective-warped top-down view using OpenCV. From there, the robot makes
 the first move randomly and the game loop begins.
@@ -37,10 +41,13 @@ any math on the fly.
   <img src="Images/IK_xy_plane.jpg" width="45%" height="800"/>
   <img src="Images/IK_z_plane.jpg" width="45%" height="800"/>
 </p>
+
 Threading is used to move joints simultaneously where needed.
 Captures are handled separately: the arm picks up the opponent's piece first, drops it off the board, then moves
 its own piece into the square.
+
 ---
+
 ## Computer Vision
 
 <img src="Images/Yolo.jpg" width="400"/>
@@ -48,12 +55,17 @@ I initially tried training a YOLOv8 model on ~250 labelled images to detect indi
 types. It was only about 75% confident which is not reliable enough for a game logic
 where a wrong detection breaks the whole game. I switched to a simpler thresholding +
 contour detection approach, which turned out to be more consistent for this setup.
+
 ---
+
 ## Hardware and Components
+
 All parts were designed in SolidWorks and 3D printed in PETG for strength. The arm has 5
 degrees of freedom driven by two 20kg-cm servos and one 35kg-cm servo. All components runs on a
 single Raspberry Pi 4, no separate microcontroller needed.
 
 <img src="Images/Robot.jpg" width="400"/>
+
 <img src="Images/Parts.jpg" width="400"/>
+
 <img src="Images/Hub.jpg" width="400"/>
