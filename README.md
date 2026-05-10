@@ -61,8 +61,8 @@ contour detection approach, which turned out to be more consistent for this setu
 ## Hardware and Components
 
 All parts were designed in SolidWorks and 3D printed in PETG for strength. The arm has 5
-degrees of freedom driven by two 20kg-cm servos and one 35kg-cm servo. Everything runs on a
-single Raspberry Pi 4 — no separate microcontroller needed.
+degrees of freedom driven by two 20kg-cm servos and one 35kg-cm servo. All components runs on a
+single Raspberry Pi 4, no separate microcontroller needed.
 ![Main Robot Assembly](Robot.HEIC)
 ![3D Printed Parts](Parts.heic)
 ![Hub assembly](Hub.HEIC)
