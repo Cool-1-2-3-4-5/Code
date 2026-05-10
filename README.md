@@ -17,10 +17,10 @@ the first move randomly and the game loop begins.
 
 
 
-![Board Setup](Images/Board_Setup.png)
+![Board Setup](Images/Board_Setup.png){width=400}
 
 
-![Tkinter GUI](Images/GUI.png)
+![Tkinter GUI](Images/GUI.png){width=400}
 
 
 After each of your moves, you press spacebar to confirm. OpenCV captures the board, applies
@@ -46,10 +46,10 @@ This means at runtime the arm just reads the angles for the target square rather
 any math on the fly.
 
 
-![Inverse Kinematics Manual Derivation (xy-place)](Images/IK_xy_plane.jpg)
+![Inverse Kinematics Manual Derivation (xy-place)](Images/IK_xy_plane.jpg){width=400}
 
 
-![Inverse Kinematics Manual Derivation (z-plane)](Images/IK_z_plane.jpg)
+![Inverse Kinematics Manual Derivation (z-plane)](Images/IK_z_plane.jpg){width=400}
 
 
 Threading is used to move joints simultaneously where needed.
@@ -61,7 +61,7 @@ its own piece into the square.
 ## Computer Vision
 
 
-![YOLOv8](Images/Yolo.jpg)
+![YOLOv8](Images/Yolo.jpg){width=400}
 
 
 I initially tried training a YOLOv8 model on ~250 labelled images to detect individual piece
@@ -78,10 +78,10 @@ degrees of freedom driven by two 20kg-cm servos and one 35kg-cm servo. All compo
 single Raspberry Pi 4, no separate microcontroller needed.
 
 
-![Main Robot Assembly](Images/Robot.jpg)
+![Main Robot Assembly](Images/Robot.jpg){width=400}
 
 
-![3D Printed Parts](Images/Parts.jpg)
+![3D Printed Parts](Images/Parts.jpg){width=400}
 
 
-![Hub assembly](Images/Hub.jpg)
+![Hub assembly](Images/Hub.jpg){width=400}
