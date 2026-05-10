@@ -39,8 +39,8 @@ geometrically using triangle relationships, then stored in a JSON lookup table.
 This means at runtime the arm just reads the angles for the target square rather than solving
 any math on the fly.
 
-![Inverse Kinematics Manual Derivation (xy-place)](Images/IK_xy_plane.heic)
-![Inverse Kinematics Manual Derivation (z-plane)](Images/IK_z_plane.heic)
+![Inverse Kinematics Manual Derivation (xy-place)](Images/IK_xy_plane.jpg)
+![Inverse Kinematics Manual Derivation (z-plane)](Images/IK_z_plane.jpg)
 
 Threading is used to move joints simultaneously where needed.
 Captures are handled separately: the arm picks up the opponent's piece first, drops it off the board, then moves
@@ -64,6 +64,6 @@ contour detection approach, which turned out to be more consistent for this setu
 All parts were designed in SolidWorks and 3D printed in PETG for strength. The arm has 5
 degrees of freedom driven by two 20kg-cm servos and one 35kg-cm servo. All components runs on a
 single Raspberry Pi 4, no separate microcontroller needed.
-![Main Robot Assembly](Images/Robot.HEIC)
-![3D Printed Parts](Images/Parts.heic)
-![Hub assembly](Images/Hub.HEIC)
+![Main Robot Assembly](Images/Robot.jpg)
+![3D Printed Parts](Images/Parts.jpg)
+![Hub assembly](Images/Hub.jpg)
