@@ -142,7 +142,7 @@ while not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
 
             # Robot calculated move
             if not gui.chess_logic.is_checkmate() and not gui.chess_logic.is_stalemate():
-                bestMove_in_UCI, bestMove_in_SAN = ChessLibrary.minimax(gui.chess_logic, gui.chess_logic.legal_moves,3,True,-100000,100000,True)
+                bestMove_in_UCI, bestMove_in_SAN = ChessLibrary.minimax(gui.chess_logic, gui.chess_logic.legal_moves,5,True,-100000,100000,True)
 
                 # Find if best move captures or just moves piece
                 if 'x' in bestMove_in_SAN: #Capture
