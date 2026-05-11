@@ -3,7 +3,7 @@
 <img src="Images/Board.jpg" width="600"/>
 
 SCB is a chess-playing robot that runs entirely on a Raspberry Pi 4. The robot plays white,
-you play black. The Robot moves its own pieces using a 5-DOF robotic arm while you make
+you play black. The Robot moves its own pieces using a 4-DOF robotic arm while you make
 your moves on the real board.
 
 ---
