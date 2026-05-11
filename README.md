@@ -74,6 +74,6 @@ single Raspberry Pi 4, no separate microcontroller needed.
 
 ## Links
 
-- [Website](https://your-website.com)
+- [Website](https://cool-1-2-3-4-5.github.io/Personal-Website/)
 
-- [YouTube Demo](https://your-youtube-link.com)
+- [YouTube Demo](https://youtu.be/Fy_8E9yMtNw?si=Ci3sZ67JCpUreh-P)
